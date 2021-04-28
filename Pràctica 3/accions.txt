@@ -1,0 +1,68 @@
+Pràctica 2 - Configuració de les interfícies de xarxa Wi-Fi
+
+Fitxers involucrats:
+accions.txt
+info_wifi.txt
+informa_wifi.sh
+interfaces_copy
+iwconfig.out
+passphrase.out
+scan.out
+
+1- Configurar les interfícies wifi d'un servidor Debian. La interfície wifi s'ha
+de connectar a una xarxa wifi amb seguretat wpa2.
+
+Senzill i ràpid.
+Agafem els drivers que el Rafa ens ha proporcionat a Atenea i procedim. Com que
+fem servir uns drivers de propietari, hem d'afegir la següent línia a /etc/apt/sources.list
+
+deb http://http.debian.net/debian/ jessie main contrib non-free
+via ràpida:
+echo deb http://http.debian.net/debian/ jessie main contrib non-free >> /etc/apt/sources.list
+
+Seguidament ja podem descarregar el driver seguit d'un update.
+	#apt-get update && apt-get install firmware-realtek
+És un bon moment per connectar l'usb a la màquina:
+	Dispositivos > USB > Realtek-GO... (o el del que es disposi)
+
+#ip a
+#ip link set wlan0 up
+
+i en teoria la comanda hauria d'activar la Interficie wifi.
+Seguidament modifiquem el fitxer /etc/nano/interfaces
+afegint:
+(abans de fer això podem calcular el psk de la nostra xarxa:
+#wpa_passphrase <ssid> <clau> >> /etc/network/interfaces)
+
+iface wlan1 inet dhcp
+				wpa-ssid <ssid>
+				wpa-psk <clau passada pel wpa_passphrase>
+
+#ifup wlan1
+
+(veure fitxers adjunts, scan.out, passphrase.out, interfaces_copy i iwconfig.out)
+
+Fins aquí la tasca, és fàcil i en teoria no hauria de donar problemes però l'usb que
+estem utilitzant, en dona molts.
+
+2- Programar un script "informa_wifi.sh" amb shell que proporcioni la següent
+informació en un fitxer de sortida "info_wifi.txt".
+
+(Adjuntats amb l'entrega els dos fitxers.)
+
+He considerat que no calia separar les Interficies wifi de les ethernet perquè
+es poden distingir pel nom i que ja que executem un script, les interficies
+ethernet segueixen sent interessant i és una informació que no ens molesta.
+
+He tingut tants problemes amb l'usb... que només ha funcionat una vegada i és quan
+li he ensenyat al Rafael, per això el fitxer info_wifi.txt no te la informació de
+wlan1 perquè he sigut incapaç de tornar-ho a aconseguir. Una experiència per
+oblidar.
+
+Llocs d'interès:
+https://wiki.debian.org/rt2800usb
+https://wiki.debian.org/es/NetworkConfiguration
+https://www.gnu.org/software/bash/manual/bashref.html
+https://ubuntuforums.org/
+http://stackoverflow.com/
+... i molts d'altres per intentar trobar solució al nostre usb.

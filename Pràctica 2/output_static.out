@@ -1,0 +1,17 @@
+15:00:28.772571 IP 192.168.1.11 > 130.89.148.14: ICMP echo request, id 1760, seq 1, length 64
+15:00:28.857775 IP 130.89.148.14 > 192.168.1.11: ICMP echo reply, id 1760, seq 1, length 64
+15:00:29.774556 IP 192.168.1.11 > 130.89.148.14: ICMP echo request, id 1760, seq 2, length 64
+15:00:29.859214 IP 130.89.148.14 > 192.168.1.11: ICMP echo reply, id 1760, seq 2, length 64
+15:00:30.776810 IP 192.168.1.11 > 130.89.148.14: ICMP echo request, id 1760, seq 3, length 64
+15:00:30.863263 IP 130.89.148.14 > 192.168.1.11: ICMP echo reply, id 1760, seq 3, length 64
+15:00:31.777895 IP 192.168.1.11 > 130.89.148.14: ICMP echo request, id 1760, seq 4, length 64
+15:00:31.863602 IP 130.89.148.14 > 192.168.1.11: ICMP echo reply, id 1760, seq 4, length 64
+15:00:32.779265 IP 192.168.1.11 > 130.89.148.14: ICMP echo request, id 1760, seq 5, length 64
+15:00:32.866146 IP 130.89.148.14 > 192.168.1.11: ICMP echo reply, id 1760, seq 5, length 64
+15:00:33.780893 IP 192.168.1.11 > 130.89.148.14: ICMP echo request, id 1760, seq 6, length 64
+15:00:33.868880 IP 130.89.148.14 > 192.168.1.11: ICMP echo reply, id 1760, seq 6, length 64
+15:00:34.782360 IP 192.168.1.11 > 130.89.148.14: ICMP echo request, id 1760, seq 7, length 64
+15:00:34.869281 IP 130.89.148.14 > 192.168.1.11: ICMP echo reply, id 1760, seq 7, length 64
+15:00:35.783959 IP 192.168.1.11 > 130.89.148.14: ICMP echo request, id 1760, seq 8, length 64
+15:00:35.868889 IP 130.89.148.14 > 192.168.1.11: ICMP echo reply, id 1760, seq 8, length 64
+

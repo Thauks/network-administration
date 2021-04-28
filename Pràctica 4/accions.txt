@@ -1,0 +1,183 @@
+Pràctica 4 - Accés al servidor mitjançant SSH
+
+	Fitxers involucrats:
+		/etc/ssh/sshd_config	--> Configuració del servidor ssh
+		/etc/ssh/ssh_config		--> Configuració de cada client
+		ssh.out					--> Arxiu on es troba la captura de paquets en format apte per WireShark
+		sshd_config.txt			--> Fitxer de configuració utilitzat
+
+	1- Configurar SSH
+
+	Tindrem dues màquines actives, clonades de la master que té una instal·lació neta. Les nombrarem client i servidor respectivament d'acord amb la funció que han d'exercir. En cada màquina hi instal·larem el paquet de SSH corresponent.
+
+	Servidor:
+		#apt-get install openssh-server
+	Arxius de configuració:
+		/etc/ssh/sshd_config
+
+	Client:
+		#apt-get install openssh-client
+	Arxius de configuració:
+		/etc/ssh/ssh_config
+	
+	- Configuració del Client:
+		
+		El client ssh ens permet definir hosts per a tal de poder abreviar les connexions. Per tal de connectar-nos al servidor que hem muntat amb ip 10.0.0.8 podem definir en el ssh_config el host i els paràmetres:
+		
+			Host entel (o el nom desitjat)
+				HostName 10.0.0.8
+				Port 22
+				User entel
+		
+		Llavors per connectar-nos només haurem de:
+			#ssh entel (o el nom inserit en el fitxer de configuració)
+
+	- Configuració del Servidor:
+	
+		- Descripció i dels paràmetres
+	
+			Per a configurar el servidor:
+				#nano /etc/ssh/sshd_config
+			On podem definir paràmetres per tal de canviar el comportament del servidor. Per exemple, els més rellevants són:
+			
+			Port 22
+				Port en el que treballa el servidor ssh.
+				
+			LoginGraceTime 120
+				El servidor s'esperarà 120 segons a que l'usuari s'autentifiqui. D'altre banda, tanca la connexió.
+			
+			PermitRootLogin without-password
+				Permet el login de root o no. La opció without password significa que no es podrà fer el login com a root mitjançant contrassenya però si mitjançant d'altres mètodes com clau pública.
+			
+			RSAAuthentication yes
+				Activa l'autenticació mitjançant una clau RSA. (Versió 1 ssh)
+			
+			PubkeyAuthentication yes
+				Activa l'autenticació mitjançant una clau pública. (Versio 2 ssh)
+			
+			PasswordAuthentication yes
+				Habilita el login (autenticació) d'un usuari mitjançant una contrassenya. En el cas de posar-la a no s'hauria de fer servir el mètode de clau pública.
+			
+			PermitEmptyPasswords no
+				Permet o no l'entrada al sistema amb una contrassenya buida.
+			
+			AllowUsers/DenyUsers
+				Defineix els usuaris que es poden connectar o no respectivament. Una opció es exclusiva de l'altre.
+			
+			MaxAuthTries 3
+				Màximn d'intents que té un usuari en una mateixa connexió per autenticar-se correctament. Contràriament, el servidor tanca la connexió i s'ha de tornar a iniciar el procés.
+			
+			MaxSessions 10
+				Nombre de sessions simultànies que admet el servidor. Opció a tenir en compte si volem mantenir el rendiment del servidor en el mateix nivell ja que molts usuaris alhora poden sobrecarregar-lo o pocs realitzant processos amb molta demanda de recursos.
+			
+			ClientAliveInterval 300
+				Manté viva la connexió SSH client mitjançant l'enviament d'un petit paquet de manteniment de connexió cada 300 segons al servidor per tal d'utilitzar la connexió ssh.
+			
+			ClientAliveCountMax 1
+				Desconnecta el client despres d' 1 petició "ClientAlive".
+				
+			Si instal·lem un servidor SSH hem d'assegurar que les carpetes tenen els permisos correctes d'acord al comportament que volem que tingui. S'ha de vigilar també amb els propietaris de les carpetes i els grups propietaris d'aquestes. L'exemple més comú és assegurar que el home pertany a l'usuari:
+				#chown entel:entel /home/entel
+				#chmod 700(o 770) /home/entel
+				
+		- L'usuari entel hi té accés mitjançant usuari i contrassenya.
+			
+			Perquè només l'usuari entel pugui tenir accés mitjançant usuari i contrassenya hem de tenir la línia:
+				AllowUsers entel
+			I assegurar-nos que l'autenticació per contrassenya estigui activada:
+				PasswordAuthentication yes
+			
+			Des del client ja podem provar que realment funciona:
+				#ssh entel@192.168.1.105
+			
+			
+		- L'usuari root hi té accés mitjançant certificat digital.
+			
+			Perquè l'usuari root (i si volem que sigui l'únic) tingui accés mitjançant certificat digital s'ha de permetre el login de root però sense password:
+				AllowUsers root
+				PermitRootLogin without-password
+			Activar l'accés per clau pública:
+				PubkeyAuthentication yes
+			I llavors s'ha de generar el certificat digital al client:
+			Ens demanarà un passphrase per tal que si el certificat cau en mans no desitjades, no comprometi l'accés a altres màquines en mode root. Introduim "seax" com a passphrase.
+			I s'ha de traslladar a la carpeta /root/.ssh/ al fitxer authorized_keys:
+				Podem fer-ho de diverses maneres. (abreviatures c: acció al client, s: acció al servidor)
+					- Comanda ssh-copy-id:
+						c: #ssh-keygen -t ed25519
+						c: #ssh-copy-id entel@192.168.1.105
+						s: #mv /home/entel/.ssh/authorized_keys ~/.ssh/
+						s: #chown root:root ~/.ssh/authorized_keys
+					- Carpeta compartida:
+						Compartir una carpeta de la màquina host a les dues màquines alhora i copiar el contingut de id_ed25519.pub a authorized_keys del servidor.
+						c: #mv ~/.ssh/id_ed25519.pub /media/Shared/
+						s: #cat /media/Shared/id_ed25519.pub >> ~/.ssh/authorized_keys
+			Un cop tenim la clau en el fitxer passem a la màquina client per a provar que realment funciona.
+				#ssh -v root@192.168.1.105
+				Amb el verbose podem veure la negociació que realitzen client i servidor per tal d'autenticar el client mitjançant la clau pública que li hem proporcionat.
+
+	- Comandes interessants per part del servidor:
+
+			#service ssh start		-> iniciar el servei
+			#service ssh stop		-> aturar el servei
+			#service ssh restart	-> reiniciar el servei
+			#service ssh status		-> comprovar l'estat del servei
+				
+			Un altre fitxer interessant és el /home/USUARI/.ssh/known_hosts que és el fitxer que emmagatzema les claus públiques dels equips als que ens hem connectat.
+			
+	- Proves i verificacions:
+		
+		- Prova del funcionament del servidor:
+			#service ssh status
+			(o amb més detall)
+			#grep 'sshd' /var/log/auth.log
+			Ens donarà informació sobre els intents de connexió i les autenticacions que s'han fet i de quin tipus han sigut per exemple:
+					May  4 07:37:43 seax sshd[2707]: Accepted publickey for root from 10.0.0.4 port 54773 ssh2: ED25519 73:d1:cc:6a:11:a2:3c:03:c4:04:9f:a5:bd:51:75:b2
+					May  4 07:37:43 seax sshd[2707]: pam_unix(sshd:session): session opened for user root by (uid=0)
+					May  4 07:37:46 seax sshd[2707]: Received disconnect from 10.0.0.4: 11: disconnected by user
+					May  4 07:37:46 seax sshd[2707]: pam_unix(sshd:session): session closed for user root
+		- Prova del funcionament del client:
+			Comprovar la ip abans de connectar-nos i després podem provar que ens hem connectat correctament:
+				#ip addr show dev eth0 | grep inet | head -1
+				output: 
+					inet 10.0.0.4/24 brd 10.0.0.255 scope global eth2
+				#ssh root@10.0.0.8
+				#ip addr show dev eth0 | grep inet | head -1
+				output:
+					inet 10.0.0.8/24 brd 10.0.0.255 scope global eth2
+			Com que sabem que la ip del servidor és 10.0.0.8 veiem que la connexió del client és correcta.
+					
+		- Captura de xarxa (ssh.out):
+			Podem demostrar aquesta connexió amb la captura ssh.out adjuntada a la pràctica, ja que si la obrim amb el wireshark, per exemple podem veure l'intercanvi de missatges entre el servidor (10.0.0.5) i el client (10.0.0.4). Veiem que el primer en iniciar la connexió és el client que és qui realitza la petició i llavors el servidor contesta. Seguidament es veu com es realitza l'intercanvi de claus i l'autentificació. Un cop autenticat, veiem que tots els paquets van encriptats i	només som capaços de veure el fluxe d'informació però no el contingut d'aquest.
+				
+
+		- Emprempta ssh:
+			  En el fitxer known_hosts tal i com hem dit. La primera vegada es demana una autorització i després s'emmagatzema l'emprempta del servidor. Si volem comprovar-la podem utilitzar la comanda:
+
+			  #ssh-keygen -l -f /etc/ssh/ssh_host_rsa_key.pub
+			  D'aquesta manera podrem veure l'emprempta del host en questió.
+			  
+			  Per la banda del client, la manera que tenim de comprovar l'emprempta és quan realitzem la primera connexió. Ens apareixarà el següent missatge:
+			  
+					The authenticity of host '10.0.0.8 (10.0.0.8)' can't be established. 
+					ECDSA key fingerprint is  c4:59:67:5e:28:9f:cb:02:be:8f:57:2a:24:eb:c6:12.
+					Are you sure you want to continue connecting (yes/no)?
+
+	-Aplicacions extra:
+	
+		- Túnels SSH
+			Es poden generar mitjançant el flag -L de la comanda ssh. Aquest permet especificar el port local pel qual volem passar pel tunnel i per on volem que entri al servidor remot:
+
+				#ssh -L 2022:@destí:22 usuari@tunnel
+				#ssh (-R -f -n) 
+
+			Per verificar que el tunel funciona la comprovació més simple és monitoritzar si el flux de dades que s'emet va encriptat o no.
+
+
+Documents d'interès:
+
+https://www.debian.org/doc/manuals/debian-faq/index.en.html
+http://unix.stackexchange.com/questions/99307/permit-root-to-login-via-ssh-only-with-key-based-authentication
+https://en.wikipedia.org/wiki/Edwards_curve
+https://cr.yp.to/crypto.html
+https://ed25519.cr.yp.to/
+https://linux.die.net/man/5/ssh_config

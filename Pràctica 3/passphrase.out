@@ -1,0 +1,5 @@
+network={
+	ssid="mestres"
+	#psk="12345678"
+	psk=718d32ac99146ece7b5f8c28258972e9a9d6cb9f866912e021b10e942f134b80
+}

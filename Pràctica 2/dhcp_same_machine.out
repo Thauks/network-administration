@@ -1,0 +1,22 @@
+04:18:10.041625 IP 192.168.60.225 > 5.153.231.4: ICMP echo request, id 962, seq 1, length 64
+04:18:10.101318 IP 5.153.231.4 > 192.168.60.225: ICMP echo reply, id 962, seq 1, length 64
+04:18:11.043836 IP 192.168.60.225 > 5.153.231.4: ICMP echo request, id 962, seq 2, length 64
+04:18:11.102967 IP 5.153.231.4 > 192.168.60.225: ICMP echo reply, id 962, seq 2, length 64
+04:18:12.044654 IP 192.168.60.225 > 5.153.231.4: ICMP echo request, id 962, seq 3, length 64
+04:18:12.103593 IP 5.153.231.4 > 192.168.60.225: ICMP echo reply, id 962, seq 3, length 64
+04:18:13.045902 IP 192.168.60.225 > 5.153.231.4: ICMP echo request, id 962, seq 4, length 64
+04:18:13.105019 IP 5.153.231.4 > 192.168.60.225: ICMP echo reply, id 962, seq 4, length 64
+04:18:14.046950 IP 192.168.60.225 > 5.153.231.4: ICMP echo request, id 962, seq 5, length 64
+04:18:14.106146 IP 5.153.231.4 > 192.168.60.225: ICMP echo reply, id 962, seq 5, length 64
+04:18:15.048772 IP 192.168.60.225 > 5.153.231.4: ICMP echo request, id 962, seq 6, length 64
+04:18:16.056279 IP 192.168.60.225 > 5.153.231.4: ICMP echo request, id 962, seq 7, length 64
+04:18:17.064300 IP 192.168.60.225 > 5.153.231.4: ICMP echo request, id 962, seq 8, length 64
+04:18:17.123472 IP 5.153.231.4 > 192.168.60.225: ICMP echo reply, id 962, seq 8, length 64
+04:18:18.065998 IP 192.168.60.225 > 5.153.231.4: ICMP echo request, id 962, seq 9, length 64
+04:18:18.125200 IP 5.153.231.4 > 192.168.60.225: ICMP echo reply, id 962, seq 9, length 64
+04:18:19.067990 IP 192.168.60.225 > 5.153.231.4: ICMP echo request, id 962, seq 10, length 64
+04:18:19.127031 IP 5.153.231.4 > 192.168.60.225: ICMP echo reply, id 962, seq 10, length 64
+04:18:20.069943 IP 192.168.60.225 > 5.153.231.4: ICMP echo request, id 962, seq 11, length 64
+04:18:20.128956 IP 5.153.231.4 > 192.168.60.225: ICMP echo reply, id 962, seq 11, length 64
+04:18:21.071176 IP 192.168.60.225 > 5.153.231.4: ICMP echo request, id 962, seq 12, length 64
+

@@ -1,0 +1,27 @@
+(Màquina host)
+
+Haciendo ping a 192.168.60.225 con 32 bytes de datos:
+Respuesta desde 192.168.60.225: bytes=32 tiempo<1m TTL=64
+Respuesta desde 192.168.60.225: bytes=32 tiempo<1m TTL=64
+Respuesta desde 192.168.60.225: bytes=32 tiempo<1m TTL=64
+Respuesta desde 192.168.60.225: bytes=32 tiempo<1m TTL=64
+
+Estadísticas de ping para 192.168.60.225:
+    Paquetes: enviados = 4, recibidos = 4, perdidos = 0
+    (0% perdidos),
+Tiempos aproximados de ida y vuelta en milisegundos:
+    Mínimo = 0ms, Máximo = 0ms, Media = 0ms
+
+___________________________________________________________________________________________________
+	
+(Màquina guest)
+
+03:54:55.216953 IP 192.168.60.229 > 192.168.60.225: ICMP echo request, id 1, seq 693, length 40
+03:54:55.216972 IP 192.168.60.225 > 192.168.60.229: ICMP echo reply, id 1, seq 693, length 40
+03:54:56.217709 IP 192.168.60.229 > 192.168.60.225: ICMP echo request, id 1, seq 694, length 40
+03:54:56.217724 IP 192.168.60.225 > 192.168.60.229: ICMP echo reply, id 1, seq 694, length 40
+03:54:57.219242 IP 192.168.60.229 > 192.168.60.225: ICMP echo request, id 1, seq 695, length 40
+03:54:57.219258 IP 192.168.60.225 > 192.168.60.229: ICMP echo reply, id 1, seq 695, length 40
+03:54:58.220717 IP 192.168.60.229 > 192.168.60.225: ICMP echo request, id 1, seq 696, length 40
+03:54:58.220733 IP 192.168.60.225 > 192.168.60.229: ICMP echo reply, id 1, seq 696, length 40
+

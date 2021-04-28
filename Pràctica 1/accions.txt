@@ -1,0 +1,132 @@
+Pràctica 1 - Creació d'un servidor Debian amb  VirtualBox
+
+Fitxers involucrats:
+
+accions.txt
+output_test.txt
+top50000.pwd
+
+Accions a fer comentades i raonades: 
+
+1- Entendre el funcionament i opcions de VirtualBox.
+    Com configurar un equip.
+	- Equip host.
+		Versió de VBox: 5.1.14 r112924
+		Guest additions: Instalarem el extension pack de VBox que ens ofereix algunes característiques interessants de cara a treballar per exemple amb usb 3.0 o cobrir algun requeriment que tenen les carpetes compartides.
+	- La configuració inicial de la màquina Debian que crearem és la següent:
+		- Escollim Linux en el tipus de màquina virtual ja que el Debian que utilitzarem es una distribució de Linux.
+		- La versió utilitzada serà Debian 32-bit.
+		- 512MB de RAM
+		- Creem un disc virtual de virtual box perquè només treballarem amb aquest virtualitzador.
+		- Establirem un tamany dinàmic de disc perquè com que la nostra màquina serà  possiblement més petita en comparació a la totalitat de l'espai reservat.
+    
+	- Configuració de la màquina ja creada (sense sistema operatiu):
+		- Primer i molt important assegurar la carpeta de Snapshots. És un tema molt important quan treballem amb màquines virtuals ja que podem restaurar l'estat de la màquina en un moment determinat.
+
+		- Ara, a l'apartat de sistema tenim 3 pestanyes: Placa base, Processador i Acceleració. D'aquestes 3 ens interessen les ordres d'arranc de la placa base que és el que arrancarà la màquina virtualitzada per ordre (semblant a la bios d'una màquina convencional), entre d'altres característiques no tant rellevants com el punter quin port utilitza o el rellotge hardware que s'utilitzarà. En l'apartat processador, escollirem un core que és el requisit per a l'assignatura. No he modificat cap paràmetre de la part d'acceleració on es troben el tema de paravirtualització i el hardware de virtualització que utilitzara VBox.
+
+		- No he tocat el tema de pantalla. Les opcions de video no són massa rellevants en la nostra pràctica.
+
+		- El tema emmagatzament és el que ja hem tocat en la pròpia creació de la màquina i assegurem que hi hagi el disc dur que acabem de crear.
+		
+		- Xarxa: Essencial.
+		Podem tenir fins a quatre adaptadors de xarxa diferents i els podem habilitar o deshabilitar en funció de les nostres necessitats. Cada adaptador podria ser una  interfície diferent en la nostra màquina. La part interessant de VBox és que també és capaç de virtualitzar la xarxa igual que fer una redirecció de ports entre la mv i la mhost la qual cosa ens pot servir per córrer diferents serveis amb la mateixa ip (accedint a diferents màquines). Per a cada adaptador tenim diverses opcions de xarxa en les quals entrarem en detall en el 3r apartat de la pràctica.
+
+		- Ports Sèrie: per altres tipus de ports.
+		- USB: Gestió dels ports USB. Detecta els dispositius del Host i podem incloure'ls o no en la nostre màquina virtual.
+		- Carpetes compartides: Tal i com diu el nom; són carpetes que fan de pont entre la màquina host i la mv. Que es comparteix el contingut entre elles. En configurarem una per a tenir un pas de fitxers entre la màquina que utilitzem i la virtual.
+
+
+    Com clonar un equip.
+
+Abans de clonar, s'ha de mencionar una opció important de VBox que són les instantànies. Opció elemental i necessària per al bon procediment d'incrementar els nostres serveis o per tenir punts de restauració del sistema i assegurar-ne la robustesa. Donat un punt d'inconsistència del sistema o una falla en els permisos ens ocasiona que la màquina no funcioni, podem restaurar des d'un punt determinat en el temps on vam fer un snapshot i seguir a partir d'alla. Molt bon sistema per fer proves.
+
+	Per clonar un equip, podem fer ctrl + O sobre la màquina que volem clonar. Tenim la opció de reinicialitzar la MAC de les Targes de xarxa per així poder utilitzar-la alhora que l'altre màquina i no tenir problemes de redirecció o amb l'ARP ja que si les tinguessim les dues alhora enceses podriem tenir problemes. També tenim la opció de clonar l'estat actual de la màquina o tot (on tot vol dir també les instantànies que tenia guardades la màquina) característica molt útil per restaurar les màquines en punts diferents i fer bifurcacions de decisions a prendre. També tenim la opció  de que sigui una clonació enllaçada. Enllaça la màquina clonada a la màquina original.
+	Apreciació: la clonació també permet clonar les instantànies que es guardin del sistema i és una bona manera de tenir punts de restauració per a màquines que hagin de donar serveis semblants. Així doncs podem treballar solsament amb una mv i quan la clonem, restaurar la primera instantània que és la de la configuració inicial.
+
+    Com gestionar la xarxa.
+
+Tenim varies opcions a l'hora de definir la xarxa i gestionar-la. Explicaré per quins motius pot ser millor o pitjor cada un dels 4 que em semblen més rellevants a l'hora de configurar una xarxa més o menys clàssica.
+
+NAT: Si tan sols volem navegar o necessitem una connexió ràpida és molt bona opció ja que no haurem de configurar els adaptadors de xarxa de les MV per tal d'utilitzar un punt d'accés a internet. NAT ofereix una traducció de les adreces internes de les màquines virtuals cap a la màquina host. Actua una espècie de firewall en el que podriem anomenar router virtual de VBox. Les màquines virtuals són invisibles un cop es traspassa al host per tant no tenen una ip amb la qual accedir a elles tot i que podriem aconseguir-ho fent un forwarding de ports. Per exemple: donada una màquina A(guest) i una H(host) si fem la seva redirecció del port 22  al 2022 de la màquina H, podrem accedir a la màquina A mitjançant SSH amb la ip d'H i el port 2022.
+
+Mode pont: la màquina virtual accedeix directament a la interfície física de la màquina host o que estigui disponible en aquesta. Per exemple si utilitzem un USB com s'ha mencionat a classe pot ser bona opció perquè estarem accedint a la interfície proporcionada per l'USB com a interficie per a poder ser usada.
+
+Mode Només amfitrió(host): El què fa es una barreja entre NAT i el mode pont on el host crea una interfície de xarxa virtual on s'hi poden connectar les màquines. Per exemple una base de dades remota per a unaltre màquina que de cara a fora no és necessaria accedir.
+
+Xarxa interna: una xarxa estanca amb el host. Pot servir per simular escenaris.
+
+2- Configurar una màquina virtual bàsica amb Debian.
+    La màquina es crearà amb la configuració mínima tant de maquinari com de programari: 1 core, 512MB de RAM, 4GB de disc i 1 thernet.
+	
+	Aquesta màquina és la que hem creat mentre feiem l'exemple d'inicialitzar els paràmetres per a fer una màquina.
+
+    La interfície de xarxa ethernet tindrà una @ MAC definida manualment.
+
+	La @ MAC la podem definir a les configuracions de xarxa de la MV a les opcions avançades. He posat la MAC: 080000000001
+
+    L'equip s'anomenarà: seax.epsevg.upc.edu .
+    Els usuaris:contrasenyes seran root:toor i entel:letne.
+
+	Debian demana nom d'equip i despres usuari:contrassenya i tan sols s'ha d'omplir amb les directrius proporcionades. És més interessant el tema de les particios i ús del disc la qual he decidit no particionar perquè es tracta d'un sistema molt petit que en tot cas es pot replicar completament en comptes de fer backups parcials o totals. He dedicat el 100% d'espai al directori arrel i si hagués de fer backups ho faria amb snapshots o bé fent backup de tota l'arrel en un altre lloc no pas dins la mateixa màquina.
+
+Seguidament crearem la carpeta compartida per la qual cosa necessitem les guest additions. Per a instalarles farem update i upgrade. He llegit que es necessiten els paquets build-essential i module-assistant:
+
+en mode root: 
+		#apt-get install build-essential module-assistant
+un cop tenim instalat els paquets corresponents hem d'"insertar" el cd de les guest additions i muntar-lo:
+		Dispositivos > Insertar CD de las guest additions....
+		#mount /media/cdrom
+i finalment executar la versió per a linux:
+		#cd /media/cdrom
+		#sh ./VBoxLinuxAdditions.run
+
+crear la carpeta compartida a dispositius amb la ruta a la màquina, escollir les opcions desitjades i escollir la opció automuntatge per tal que la carpeta es munti quan iniciem la mv. Reiniciem per a veure si ha funcionat i efectivament. Ara podem passar qualsevol arxiu des de la màquina host a la mv com per exemple els fitxers que farem servir en el següent punt de la pràctica.
+
+3- Verificació de les contrasenyes utilitzades.
+
+	Primerament hem d'instalar el paquet perquè la instalació que hem fet no porta cap aplicació, ni el SSH ja que voliem la màquina el més neta possible per a tal de ser capaços de configurar-ho tot per nosaltres mateixos i no instalar que no s'utilitzin ja que no tenim gaire espai de disc per treballar.
+	Fem el login com a root amb #su ja que només els superusuaris poden instalar paquets.
+	#aptitude install john
+	Un cop instalat passem a veure el funcionament del paquet.
+	Abans de tot, crearem un parell de users dummies on a un li he posat una cotntrassenya que utilitzo jo i a l'altre una contrassenya mitjaneta no massa llarga(5-8 digits) per comprovar la força bruta de john.
+	S'ha de dir que la contrassenya que utilitzo jo és de 13 caràcters i és semblant a una contrassenya WEP de router amb alguna modificació així que dificilment john sigui capaç de crackejar-la.
+
+Un apunt sobre l'algorisme de hash que fa servir: utilitza SHA-512 i això es pot saber tal i com emmagatzema els passwords. $6 és el tipus d'algorisme i $... la "sal" que se li ha afegit al password perquè per a la mateixa paraula, la funció de hash retorni un altre valor completament diferent.
+
+Proves:
+
+Força bruta
+
+Per començar, debian utilitza Shadow Password Suite, la qual cosa significa que no podem executar john sobre el fitxer de passwd que tenim a /etc perquè no té el format que john necessita per treballar. Per això per sort, tenim l'eina unshadow que combina els formats de /etc/shadow i /etc/passwd per a poder treballar.
+#unshadow /etc/passwd /etc/shadow > /home/entel/john_test/test
+#adduser dummy
+#UNIX password: banana -> el crackeja
+#UNIX password: bible00
+No ha pogut amb aquest últim i com que he vist que tardava una estona i al ser una contrassenya mitjanament llarga he decidit fer servir varis processos per provar les possibilitats que ofereix john però al estar utilitzant un sol core, dubto que hi hagi millores aparents. Fins i tot podriem caure en un problema d'overheads per culpa de la concurrència perquè en el nostre cas tan sols tenim un core.
+#usuari jordi:password meu -> veient els resultats anteriors ja no m'he atrevit a provar-ho.
+(entenem per contrassenya llarga una de més de 10 caràcters)
+
+Diccionaris de contrasenyes
+
+Anomenem diccionaris als fitxers que contenen un conjunt de contrassenyes que el programa provarà per tal d'intentar evitar càlculs innecessaris si la contrassenya està indexada en el nostre diccionari. És una característica molt bona de john ja que permet utilitzar una base de dades de contrassenyes comuns revelades i provar-les amb prioritat.
+Les regles també són un ús comú en els diccionaris, afegir una regla implica per exemple, que s'apliquin variacions en les contrassenyes del diccionari per tal de provar les petites modificacions. Un exemple bàsic sobre una regla podria ser canviar les e per 3 ja que són coses que se solen fer.
+
+Per utilitzar un diccionari amb john provarem les opcions que ens ofereix:
+#john --wordlist=/media/sf_Shared/top50000.pwd test
+#john --show test > output_test.txt
+
+En el fitxer output_test.txt veiem que ha quedat una per crackejar que era la meva contrassenya.
+L'ús de diccionaris beneficia sobretot les que són paraules llargues com ciocolata en la qual estalviem moltissims recursos per a buscar-la fent força bruta si la incloem en un diccionari.
+
+Conclusions:
+
+Hem vist que una funció de hash és molt vulnerable a la força bruta ja que sabent el paràmetre de sal i tenint l'output de la taula, el valor correspondrà quan calculem la paraula utilitzada. Per això a l'hora d'emmagatzemar contrassenyes s'ha de tenir especial cura amb els permisos que se'ls dona als usuaris perquè fitxers com el shadow no haurien de poder ser consultats mai tot i tenir una funció de hash força potent perquè si els usuaris no s'asseguren d'utilitzar una contrassenya prou bona, podriem sofrir el robatori d'informació.
+
+Documents d'interès:
+
+(recomanable sencer, 11:20 diccionaris) https://www.youtube.com/watch?v=7U-RbOKanYs
+https://www.debian.org/doc/manuals/debian-faq/index.en.html
+https://www.virtualbox.org/manual/
+http://www.openwall.com/john/doc/
+http://www.tldp.org/LDP/lame/LAME/linux-admin-made-easy/shadow-file-formats.html

@@ -1,0 +1,8 @@
+root:toor:0:0:root:/root:/bin/bash
+entel:letne:1000:1000:entel,,,:/home/entel:/bin/bash
+dummy:banana:1002:1002:dummy,,,:/home/dummy:/bin/bash
+seax:123456:1004:1004::/home/seax:/bin/sh
+jerk:ciocolata:1005:1005::/home/jerk:/bin/sh
+moron:gusanito:1006:1006::/home/moron:/bin/sh
+
+6 password hashes cracked, 1 left

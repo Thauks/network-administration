@@ -1,0 +1,171 @@
+Pràctica 2 - Configuració de les interfícies de xarxa ethernet
+
+Fitxers Involucrats:
+accions.txt  			-->  és aquest fitxer
+/etc/network/interfaces -->  és el fitxer interfaces
+/etc/resolv.conf		-->  on s'emmagatzemen les resolucions de DNS
+/etc/passwd 			-->  fitxer on es consulten els usuaris
+dhcp_output.out			-->  output(tcpdump) de la configuració amb dhcp
+dhcp_same_machine.out	-->	 output(tcpdump) de la configuració amb dhcp sobre la mateixa màquina
+output_static.out		-->  output(tcpdump) de la configuració static
+informa_eth.sh			-->  script en bash
+info_eth.txt 			-->  exemple d'output de l'script (recomanat no obrir amb bloc de notes)
+Captura.PNG				-->  captura del resultat de l'Script
+
+1- Configurar les interfícies ethernet d'un servidor Debian. La interfície ethernet
+s'ha de configurar tant de forma dinàmica com estàtica.
+
+Primer de tot vegem com activar i desactivar una interfície ja declarada en el interfaces:
+
+#ifup INTERFICIE
+#ifdown INTERFICIE
+
+Per renombrar una interficie podem fer servir ip:
+
+#ip link set INTERFICIE down
+#ip link set INTERFICIE name NOU_NOM
+#ip link set NOU_NOM up
+
+Activar el mode pont en Vbox i posar l'adaptador de xarxa real que utilitzem.
+
+El fitxer /etc/network/interfaces:
+
+Primer, la manera com inicia les interficies.
+- allow-hotplug: inicia la INTERFICIE quan el kernel detecta un esdeveniment de connexió a la interfície
+- auto: inicia la INTERFICIE en l'arrancada del sistema
+
+Segon, la definició de la configuració de xarxa.
+- la interficie loopback que sempre existeix
+- iface INTERFICIE inet dhcp: la xarxa es serveix de dhcp per configurar la xarxa
+- iface INTERFICIE inet static: la xarxa es configura manualment
+
+Exemple de configuració:
+
+#ip a 							//per comprovar els dispositius disponibles i escollir-ne una
+#nano /etc/network/interfaces	//per editar el fitxer
+
+afegim les següents línies en el fixer:
+
+auto eth0
+allow-hotplug eth0
+iface eth0 inet dhcp
+#ctrl+x 						//per tancar el nano
+
+#service networking restart 	//per reiniciar el servei de xarxa
+(podem configurar el pre/post-up i el pre/post-down per tal de que s'executi alguna comanda o
+script abans o després d'iniciar les interfícies)
+
+#ping www.debian.org 			//per comprovar que tenim connexió
+
+Proves de connexió:
+
+Configuració dinàmica (dhcp) a /etc/network/interfaces:
+
+		allow-hotplug eth0
+		iface eth0 inet dhcp
+
+Tests de connexió.
+Per als test utilitzem el capturador de paquets tcpdump
+Test 1. Màquina host (windows) fa ping a la màquina guest (deb). (fitxer dhcp_output.out)
+
+#apt-get install tcpdump
+
+He activat la comanda tcp dump ambn el filtratge per a la interfície que m'interessava(eth0)
+i els paquets icmp que són els que utilitza ping:
+#tcpdump -nni eth0 icmp > dhcp_output.out
+
+i al powershell de windows:
+#ping 192.168.60.225 > dhcp_output.out
+
+Ho he ajuntat en el fitxer mencionat. El què passa és que el host envia els paquets
+on qui els rep es el guest el qual fa el reply per al paquet rebut.
+
+Test 2. Ping a www.debian.org (fitxer dhcp_same_machine.out)
+
+Igual que abans però ara tenim un client ssh per a poder evaluar trànsit mentre fem un ping.
+En una sessió ssh fem la mateixa comanda d'abans del tcpdump i en l'altre un ping a debian.
+
+Configuració estàtica (static) (manualment):
+
+En el fitxer /etc/network/interfaces hem de comentar les línies abans mencionades
+i afegir les següents:
+
+	iface eth0 inet static
+		address 	192.168.1.11
+		netmask 	255.255.255.0
+		network 	192.168.1.0
+		broadcast	192.168.1.255
+		gateway		192.168.1.1
+
+Aquí es poden afegir les línies dns-nameservers i dns-search. On els dns-nameservers
+son les ips dels servidors de dns que tinguem i el dns-search és la llista (si n'hi ha
+més d'un) de búsqueda del hostname. Si la definició dels nameservers es vol fer estàtica
+és aquí on s'ha de fer. D'altra banda es millor utilitzar el programa resolvconf.
+
+Test de connexió.
+
+Test. El mateix que el test 2 fet a la part dinàmica. (fitxer output_static.out)
+
+En aquest cas, és molt fàcil saber si una ip està lliure i evitar col·lisions sempre
+perquè coneixem la topologia de la xarxa perquè possiblement en siguem els administradors.
+
+En el cas de que ho féssim a l'escola, la cosa canvia ja que el dhcp és qui distribueix
+les ip pels equips. El problema que té això es que podríem assignar una ip i que aquesta
+entri en col·lisió amb una altre provocant el mal funcionament de la xarxa. La idea
+que he tingut per solucionar aquest problema, seria fer un script que comproves les
+ip lliures en la xarxa en la que ens trobem amb la comanda nmap i poder saber quines
+ho estan per seguidament agafar-ne una. Posaríem l'script al crontab perquè s'executés
+cada x temps per fer la comprovació de si hi ha algú més fent servir la nostra ip i
+llavors la canviaríem.
+
+2- Progrmar un script "informa_eth.sh" amb shell que proporcioni la següent informació
+en un fitxer de sortida "info_eth.txt".
+
+Podem veure que els paràmetres requierits per l'script es poden obtenir per vies molt
+diferents, ja sigui una comanda directa o parsejant un fitxer.
+
+Sabent això és interessant centrar-nos en aspectes de l'script i comprovar que les dades
+s'obtenen igual per un costat com per l'altre.
+
+Els usuaris llistats són tots aquells que tenen un shell per executar comandes, no només
+humans. Des del punt de vista del sistema ens interessa saber qui té permís per executar.
+
+També l'adreça del router és per on s'encamina el trànsit. Serà la mateixa adreça que
+el gateway ja que és el router qui ens permet sortir de la xarxa. Les comandes per a
+trobar l'adreça del router són (veiem que arribem al mateix punt):
+#ip route
+default via 192.168.1.1 dev eth0
+169.254.0.0/16 dev eth0  scope link  metric 1000
+192.168.1.0/24 dev eth0  proto kernel  scope link  src 192.168.1.107
+
+O fent servir la taula de routing del kernel
+#route
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+default         192.168.1.1     0.0.0.0         UG    0      0        0 eth0
+link-local      *               255.255.0.0     U     1000   0        0 eth0
+192.168.1.0     *               255.255.255.0   U     0      0        0 eth0
+
+#netstat -r
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+default         192.168.1.1     0.0.0.0         UG        0 0          0 eth0
+link-local      *               255.255.0.0     U         0 0          0 eth0
+192.168.1.0     *               255.255.255.0   U         0 0          0 eth0
+
+L'adreça ip externa no la podem saber des de dins de la màquina per això la consulta
+s'ha d'exterioritzar per a saber com ens veu una màquina de fora la nostre xarxa.
+
+Un altre exemple, el nom del dns el podem aconseguir amb la comanda dig sobre la nostra ip o
+des del fitxer resolv.conf que el modifica el client dhcp.
+#dig -x ip +short
+#cat /etc/resolv.conf
+
+Documents d'interès:
+
+- https://www.debian.org/doc/
+- http://linuxcommand.org/
+- https://tiswww.case.edu/php/chet/bash/bashref.html
+- https://ipinfo.io/
+- https://linux.die.net/man/1/dig
+- http://www.tcpdump.org/tcpdump_man.html

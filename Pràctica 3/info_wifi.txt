@@ -1,0 +1,166 @@
+ ========================================================================
+|         NetStat and NetInfo Script By: Jordi Mestres. SEAX		|
+ ========================================================================
+	Dades de l'equip
+
+	Data:				lun mar 13 13:06:37 CET 2017
+	Usuaris Humans:		 	root 
+	Hostname:			craax
+	Addr IP del router:		147.83.159.222 192.168.4.254
+	Addr IP externa:		147.83.159.201
+	Addr IP DNS primari:		127.0.1.1
+	Addr IP DNS secundari:		
+
+	Interficie:  enp0s25
+		Addr MAC:		 6c:62:6d:5a:26:46
+		INTERFICIE ACTIVA 
+		Addr IP:		 147.83.159.201
+		Nom DNS:		
+		Mascara de xarxa:	 255.255.255.224
+		Addr de xarxa:		 147.83.159.192
+		Nom de la xarxa:	
+		MTU:			 1500
+
+
+	Interficie:  ens1
+		Addr MAC:		 00:1b:21:75:29:22
+		INTERFICIE INACTIVA 
+
+	Interficie:  lo
+		Addr MAC:		 00:00:00:00:00:00
+		INTERFICIE INACTIVA 
+
+	Interficie:  wlxc412f52e00d0
+		Addr MAC:		 c4:12:f5:2e:00:d0
+		INTERFICIE ACTIVA 
+		Addr IP:		 192.168.4.64
+		Nom DNS:		
+		Mascara de xarxa:	 255.255.255.0
+		Addr de xarxa:		 192.168.4.0
+		Nom de la xarxa:	
+		MTU:			 1500
+
+ ---------------------------------------------------------------------
+  Escanejant...
+   __________________________________________________________________
+	 AP  1
+		MAC AP:				B8:27:EB:5F:21:08
+		Nº de canal:			1
+		Qualitat:			99/100
+		Nivell de Senyal:		76/100
+		ESSID:				Cartago
+		Xifrat:				Si
+   ___________________________________________________________________
+	 AP  2
+		MAC AP:				D4:CA:6D:04:A5:A6
+		Nº de canal:			1
+		Qualitat:			0/100
+		Nivell de Senyal:		95/100
+		ESSID:				CanalBlau
+		Xifrat:				Si
+   ___________________________________________________________________
+	 AP  3
+		MAC AP:				00:1E:13:85:E8:11
+		Nº de canal:			1
+		Qualitat:			0/100
+		Nivell de Senyal:		61/100
+		ESSID:				XSF-UPC
+		Xifrat:				No
+   ___________________________________________________________________
+	 AP  4
+		MAC AP:				66:D9:E7:91:6A:A2
+		Nº de canal:			6
+		Qualitat:			0/100
+		Nivell de Senyal:		43/100
+		ESSID:				neapolis
+		Xifrat:				No
+   ___________________________________________________________________
+	 AP  5
+		MAC AP:				56:D9:E7:91:6A:A2
+		Nº de canal:			6
+		Qualitat:			0/100
+		Nivell de Senyal:		46/100
+		ESSID:				neapolis-P
+		Xifrat:				Si
+   ___________________________________________________________________
+	 AP  6
+		MAC AP:				54:E6:FC:D1:22:6E
+		Nº de canal:			6
+		Qualitat:			0/100
+		Nivell de Senyal:		44/100
+		ESSID:				GUANAYII(GUI)
+		Xifrat:				No
+   ___________________________________________________________________
+	 AP  7
+		MAC AP:				46:D9:E7:91:6A:A2
+		Nº de canal:			6
+		Qualitat:			0/100
+		Nivell de Senyal:		43/100
+		ESSID:				e-cowork
+		Xifrat:				Si
+   ___________________________________________________________________
+	 AP  8
+		MAC AP:				44:D9:E7:91:6A:A2
+		Nº de canal:			6
+		Qualitat:			0/100
+		Nivell de Senyal:		43/100
+		ESSID:				p-cowork
+		Xifrat:				Si
+   ___________________________________________________________________
+	 AP  9
+		MAC AP:				00:19:A9:A6:4D:60
+		Nº de canal:			9
+		Qualitat:			0/100
+		Nivell de Senyal:		100/100
+		ESSID:				eduroam
+		Xifrat:				Si
+   ___________________________________________________________________
+	 AP  10
+		MAC AP:				00:19:A9:A6:4D:61
+		Nº de canal:			9
+		Qualitat:			0/100
+		Nivell de Senyal:		100/100
+		ESSID:				XSF-UPC
+		Xifrat:				No
+   ___________________________________________________________________
+	 AP  11
+		MAC AP:				00:19:A9:A6:4D:63
+		Nº de canal:			9
+		Qualitat:			0/100
+		Nivell de Senyal:		100/100
+		ESSID:				
+		Xifrat:				Si
+   ___________________________________________________________________
+	 AP  12
+		MAC AP:				D4:7B:B0:EF:44:35
+		Nº de canal:			9
+		Qualitat:			0/100
+		Nivell de Senyal:		26/100
+		ESSID:				MOVISTAR_4434
+		Xifrat:				Si
+   ___________________________________________________________________
+	 AP  13
+		MAC AP:				00:13:F7:FD:94:CB
+		Nº de canal:			10
+		Qualitat:			0/100
+		Nivell de Senyal:		26/100
+		ESSID:				REMPARK_TRIALS
+		Xifrat:				Si
+   ___________________________________________________________________
+	 AP  14
+		MAC AP:				E2:41:36:0A:33:E0
+		Nº de canal:			11
+		Qualitat:			0/100
+		Nivell de Senyal:		38/100
+		ESSID:				MOVISTAR_33E0
+		Xifrat:				Si
+   ___________________________________________________________________
+	 AP  15
+		MAC AP:				00:1C:B3:AF:65:6A
+		Nº de canal:			11
+		Qualitat:			0/100
+		Nivell de Senyal:		26/100
+		ESSID:				cintowifi
+		Xifrat:				Si
+   ___________________________________________________________________
+========================================================================

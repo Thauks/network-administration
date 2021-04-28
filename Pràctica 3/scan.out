@@ -1,0 +1,54 @@
+wlan1     Scan completed :
+          Cell 01 - Address: C0:EE:FB:34:68:24
+                    ESSID:"mestres"
+                    Protocol:IEEE 802.11bgn
+                    Mode:Master
+                    Frequency:2.432 GHz (Channel 5)
+                    Encryption key:on
+                    Bit Rates:108 Mb/s
+                    Extra:rsn_ie=30140100000fac040100000fac040100000fac020c00
+                    IE: IEEE 802.11i/WPA2 Version 1
+                        Group Cipher : CCMP
+                        Pairwise Ciphers (1) : CCMP
+                        Authentication Suites (1) : PSK
+                    Quality=0/100  Signal level=2/100  
+          Cell 02 - Address: 20:A4:3C:7D:A4:A6
+                    ESSID:"Balaguer"
+                    Protocol:IEEE 802.11bgn
+                    Mode:Master
+                    Frequency:2.422 GHz (Channel 3)
+                    Encryption key:on
+                    Bit Rates:144 Mb/s
+                    Extra:rsn_ie=30140100000fac040100000fac040100000fac020000
+                    IE: IEEE 802.11i/WPA2 Version 1
+                        Group Cipher : CCMP
+                        Pairwise Ciphers (1) : CCMP
+                        Authentication Suites (1) : PSK
+                    Quality:0  Signal level:0  Noise level:0
+          Cell 03 - Address: 26:A4:3C:7D:A4:A6
+                    ESSID:"AjVNG Mitjans Comunicacio"
+                    Protocol:IEEE 802.11bgn
+                    Mode:Master
+                    Frequency:2.422 GHz (Channel 3)
+                    Encryption key:on
+                    Bit Rates:144 Mb/s
+                    Extra:rsn_ie=30140100000fac040100000fac040100000fac020000
+                    IE: IEEE 802.11i/WPA2 Version 1
+                        Group Cipher : CCMP
+                        Pairwise Ciphers (1) : CCMP
+                        Authentication Suites (1) : PSK
+                    Quality:0  Signal level:0  Noise level:0
+          Cell 04 - Address: 64:CC:2E:ED:59:C8
+                    ESSID:"AAAAAHRC36IAQwF7Redmi"
+                    Protocol:IEEE 802.11bgn
+                    Mode:Master
+                    Frequency:2.437 GHz (Channel 6)
+                    Encryption key:on
+                    Bit Rates:108 Mb/s
+                    Extra:rsn_ie=30140100000fac040100000fac040100000fac020c00
+                    IE: IEEE 802.11i/WPA2 Version 1
+                        Group Cipher : CCMP
+                        Pairwise Ciphers (1) : CCMP
+                        Authentication Suites (1) : PSK
+                    Quality:0  Signal level:0  Noise level:0
+

@@ -1,0 +1,27 @@
+=========================================================================
+|         NetStat and NetInfo Script By: Jordi Mestres. SEAX		|
+=========================================================================
+	Dades de l'equip
+
+	Data:				mar mar 21 10:21:40 CET 2017
+	Usuaris Humans:		 	root mestres
+	Hostname:			craax
+	Addr IP del router:		147.83.159.222
+	Addr IP externa:		147.83.159.201
+	Addr dels DNSs:			127.0.1.1
+
+	Interficie:  enp0s25
+		Addr MAC:		 6c:62:6d:5a:26:46
+		INTERFICIE ACTIVA 
+		Addr IP:		 147.83.159.201
+		Nom DNS:		
+		Mascara de xarxa:	 255.255.255.224
+		Addr de xarxa:		 147.83.159.192
+		Nom de la xarxa:	
+		Nom Dns de la xarxa	
+		MTU:			 1500
+
+	Interficie:  ens1
+		Addr MAC:		 00:1b:21:75:29:22
+		INTERFICIE INACTIVA 
+=========================================================================
