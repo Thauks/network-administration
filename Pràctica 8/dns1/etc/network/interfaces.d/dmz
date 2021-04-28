@@ -1,0 +1,6 @@
+auto eth-dmz
+allow-hotplug eth-dmz
+iface eth-dmz inet static
+	address 10.10.2.4
+	netmask 255.255.255.240
+	gateway 10.10.2.1

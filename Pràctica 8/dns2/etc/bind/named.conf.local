@@ -1,0 +1,42 @@
+
+zone "dmz.jm." {
+	type slave;
+	file "/var/lib/bind/db.dmz.jm";
+	masters{
+		10.10.2.4;
+	};
+	//forwarders {};
+	allow-transfer { 10.10.2.4; };
+};
+zone "clients.jm." {
+	type slave;
+	file "/var/lib/bind/db.clients.jm";
+	masters{
+		10.10.2.4;
+	};
+	//forwarders {};
+	allow-transfer { 10.10.2.4; };
+};
+zone "servidors.jm." {
+	type slave;
+	file "/var/lib/bind/db.servidors.jm";
+	masters{
+		10.10.2.4;
+	};
+	//forwarders {};
+	allow-transfer { 10.10.2.4; };
+};
+
+zone "10.10.in-addr.arpa." {
+		type slave;
+		file "/var/lib/bind/db.invers.inv";
+		masters{
+			10.10.2.4;
+		};
+		//forwarders {};
+		allow-transfer { 10.10.2.4; };
+};
+
+//include "/etc/bind/zones.rfc1918";
+
+

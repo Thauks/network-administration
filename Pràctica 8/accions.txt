@@ -1,0 +1,411 @@
+Pràctica 8 - Encaminament i NAT
+
+Fitxers involucrats:
+	nota: els fitxers de cada màquina estan agrupats en carpetes pel nom de les màquines, s'han agafat els més modificats, els que se'ls ha afegit una línia durant la pràctica no però estan involucrats amb cada màquina també.
+
+	accions.txt
+	fw_acces.sh
+	fw_usuaris.sh
+	fw_servidors.sh
+	fw_logs.sh
+	logs.out
+	/etc/network/interfaces
+	/etc/udev/rules.d/70-persistent-net.rules
+	/etc/sysctl.conf
+	/etc/rsyslog.conf
+
+- Objectiu de la pràctica:
+
+	L'objectiu de la pràctica és muntar una xarxa que es correspongui amb les directrius donades per a la realització d'aquesta i seguint l'esquema que representa la figura: Escenari.png.
+
+- Accions a fer:
+
+	0. Abans de començar
+	
+		Preparem tantes màquines com es necessiten per complir els requisits mínims de la xarxa a partir d'una màquina inicial on teniem una carpeta compartida per transmetre fitxers i els serveis ssh activats per als usuaris per tal de poder accedir, si ens feia falta a cada màquina.
+		
+		Clonarem un total de 8 màquines: 3 routers, 2 màquines host, 2 dns i 1 monitor (que l'anirem passant de xarxa en xarxa).
+		
+	1. Adreçament
+	
+		Per començar, s'ha de crear cada adaptador de xarxa i connectar-lo a la xarxa interna on volguem que aquest operi. Per exemple:
+		
+		* Router d’accés 
+			· Funció: aïllar de la xarxa troncal
+			· Interfícies
+			· Troncal -> IP: x.y.z.u - MAC: 08:00:27:00:01:??
+			· DMZ -> IP: 10.10.2.1 - MAC: 08:00:27:10:02:01
+			· VPN -> IP: 10.10.5.1 - MAC: 08:00:27:10:05:01
+			· Serveis: encaminament, tallafocs i NAT.
+		Pel router d'accés el què hem de fer és anar a la configuració de vbox de xarxa de la màquina i activar 2 interfícies de xarxa (3 si contemplem la de la VPN). La primera i la que ens fara de porta d'enllaç al primer router extern serà la Troncal la qual li donarem la característica d'estar connectat a adaptador pont, el que farà que la xarxa on està connectat l'equip host detecti l'adaptador també. D'altra banda hem de connectar el router a la DMZ la qual cosa ho farem amb mode xarxa interna la qual li donarem el nom de dmz.
+		
+		Així doncs, tots els equips que haguem de connectar a la dmz on es troba el router d'accés, els hem de posar amb la mateixa configuració de xarxa interna i a la xarxa que hem anomenat dmz.
+		
+		Un cop fet això repetirem amb cada subxarxa que volguem muntar.
+		
+		Seguidament, podem instalar el dhcp per les xarxes de clients i la dmz en el servidor en el router d'usuaris. Aquest, ens facilitarà l'assignació d'adreces en els equips que es configurin en mode dhcp així com les rutes per defecte que han de prendre.
+		
+		Un cop instal·lat el dhcp conforme amb la pràctica 6, s'han considerat dues opcions suficientment bones per tenir en compte depenent de l'escenari que es vulgui muntar:
+		
+			1. Configurar totes les interfícies que considerem fixes de manera estàtica en els fitxers d'interfícies de cada màquina.
+			
+			2. Configurar totes les interfícies que es pugui en mode dhcp i controlar les adreces en el dhcp.
+			
+		El què ens ofereix la 1 és la certesa de l'adreça on es troba cada màquina ja que no depèn d'un servei implementat en la xarxa per tenir una adreça ip operativa. D'altra banda, si es configura com en la opció 2, podem modular la xarxa adaptant-la a l'escenari que es vulgui recrear: canvis d'ip, nous routers, honey pots... El que extreiem d'això és que necessitem una 3a opció que sigui un intermig entre 1 i 2 que ens serà la més vàlida per tenir un escenari que admet canvis però manté les bases per si el servei dhcp falla.
+		
+		Configurem els fitxers d'interfícies (/etc/network/interfaces.d/[nom_interficie]) corresponent a l'esquema proporcionat:
+				
+			- Router accés:
+				auto eth-dmz*
+				allow-hotplug eth-dmz
+				iface eth-dmz inet static
+					address 10.10.2.1
+					netmask 255.255.255.240
+					
+			- Router Usuaris:
+				auto eth-dmz
+				allow-hotplug eth-dmz
+				iface eth-dmz inet static
+					address 10.10.2.2
+					netmask 255.255.255.240
+					
+			- Router Servidors:
+				auto eth-dmz
+				allow-hotplug eth-dmz
+				iface eth-dmz inet static
+					address 10.10.2.3
+					netmask 255.255.255.240
+	
+			Fins a tenir tots els equips en les ip corresponents.
+		
+			*Notem que els noms de les interfícies són personalitzats per a la pràctica. Això ho aconseguim modificant la mac i el nom en el fitxer /etc/udev/rules.d/70-persistent-net.rules. Hem d'afegir una línia per a cada mac d'adaptador disponible configurat i canviar el camp nom d'acord amb l'especificat a la pràctica.
+			
+		2. Routing
+
+			- Pas previ:
+			
+				La distribució, per defecte porta el forwarding de paquets desactivat. El què hem de fer és:
+					
+					#nano /etc/sysctl.conf
+				
+				I descomentar la línia següent:
+					
+					net.ipv4.ip_forward=1
+				
+				D'aquesta manera si li arriba un paquet que no és per ell farà el forwarding d'acord amb les rutes que té registrades. Cal afegir que no s'ha adjuntat ja que l'script d'iptables executa la comanda per tal de no haver de fer-ho manualment.
+				
+			- Taules de routing:
+			
+				El que fa la taula de routing és guiar els paquets que no s'hagin de quedar a la nostra màquina. O en el cas d'una màquina que no és un router, indica a on hem d'enviar el trànsit de dades per tal d'aconseguir la connexió desitjada.
+				
+				Taula del router d'accés:
+				
+					Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+					default         192.168.1.1     0.0.0.0         UG    0      0        0 eth-troncal
+					10.10.2.0       *               255.255.255.240 U     0      0        0 eth-dmz
+					192.168.1.0     *               255.255.255.0   U     0      0        0 eth-troncal
+
+				
+				Taula del router d'usuaris:
+				
+					Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+					default         10.10.2.1       0.0.0.0         UG    0      0        0 eth-dmz
+					10.10.2.0       *               255.255.255.240 U     0      0        0 eth-dmz
+					10.10.3.0       10.10.2.3       255.255.255.240 UG    0      0        0 eth-dmz
+					10.10.4.0       *               255.255.255.240 U     0      0        0 eth-clients
+					link-local      *               255.255.0.0     U     1000   0        0 eth-clients
+				
+				
+				Taula del router de servidors:
+				
+					Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+					default         10.10.2.1       0.0.0.0         UG    0      0        0 eth-dmz
+					10.10.2.0       *               255.255.255.240 U     0      0        0 eth-dmz
+					10.10.3.0       *               255.255.255.240 U     0      0        0 eth-servidors
+					10.10.4.0       10.10.2.2       255.255.255.240 UG    0      0        0 eth-dmz
+					link-local      *               255.255.0.0     U     1000   0        0 eth-dmz
+				
+				El que estem fent en aquestes taules d'encaminament és posar de porta d'enllaç (gateway) per defecte el router d'accés i en el cas del trànsit intern ja no el fem passar pel router principal sinó que si el destí es la subxarxa de servidors (des dels usuaris), el router dels usuaris fara forwarding dels paquets directament al router dels servidors i viceversa.
+				
+				Per a establir les rutes es pot fer servir tant la comanda ip route com la route:
+				
+					#ip route add default via 10.10.2.1 dev eth-dmz
+					#ip route add 10.10.3.0/28 via 10.10.2.3 dev eth-dmz
+				
+				Les rutes estan muntades per tal que qualsevol en la xarxa clients utilitzi el router per als usuaris, el mateix en els servidors i finalment el router de la dmz que és el que realitza la comunicació cap a fora.
+				
+				En el cas d'utilitzar el monitor de la dmz cal establir les rutes com les dels routers interns sinó el router d'accés filtrarà els paquets.
+				
+		3. NAT
+			
+			La traducció d'adreces és necessaria per tal d'emmascarar la ip un cop aquesta surti del router o qualsevol host extern no sabrá on tornar el paquet. El que fem en aquest cas, és modificar l'output del postrouting i fer un masquerade per emmascarar la informació sota la ip del router, d'aquesta manera aconseguim que les respostes es facin sobre el router i aquest finalment desenmascara i ho envia a l'equip que ha solicitat el paquet.
+			
+			Pel router extern:
+				#iptables -t nat -A POSTROUTING -o eth-troncal -j MASQUERADE
+			
+			Notem que el paràmetre -o ens ha d'indicar la interfície per la qual emmascararem els paquets.
+			
+			De la mateixa manera hem de fer nat pels equips els quals volem que siguin accedits des de fora de la nostra xarxa, principalment els de la dmz (DNS1 i DNS2) i també el monitor per si l'administrador necessites entrar a la xarxa des de fora en un moment determinat. Ho farem de la següent manera:
+			
+				#iptables -t nat -A PREROUTING -i eth-troncal -p udp --dport 53 -j DNAT --to-destination 10.10.2.4:53
+				#iptables -A FORWARD -i eth-troncal -p udp --dport 53 -o eth-dmz -m conntrack --ctstate NEW -d 10.10.2.4 -j ACCEPT
+				
+				#iptables -t nat -A PREROUTING -i eth-troncal -p tcp --dport 22 -j DNAT --to-destination 10.10.2.11:22
+				#iptables -A FORWARD -i eth-troncal -p tcp --dport 22 -o eth-dmz -m conntrack --ctstate NEW -d 10.10.2.11 -j ACCEPT
+		
+		
+		4. Filtrat
+		
+			- Comunicacions permeses:
+				
+				Internet --> DMZ : només acceptarem peticions dns i connexió ssh redirigida al monitor per tenir accés a la xarxa desde fora.
+				Internet --> clients : el filtratge ja el realitza el router d'accés, es podria fer el mateix que amb el monitor de la dmz però és millor que estigui restringit i accedir des del monitor a la xarxa de clients.
+				Internet --> servidors : igual que en els clients
+
+				DMZ --> Internet : ho permetem tot.
+				DMZ --> clients : només permetem que entri trànsit del monitor, router de servidors i router d'accés (per si es canviés alguna política no hauriem de tocar tots els fw).
+				DMZ --> servidors: igual que en els clients però amb el router d'usuaris.
+
+				clients -->	Internet : ho permetem tot.
+				clients -->	DMZ : ho permetem tot.
+				clients -->	servidors : ho permetem tot.
+				
+				servidors --> Internet : ho permetem tot.
+				servidors --> DMZ : ho permetem tot.
+				servidors --> clients : ho permetem tot.
+				
+				En el cas dels clients i servidors s'ha decidit mantenir una política molt flexible ja que sent unes subxarxes tant petites i per l'ús que tenen cada una, és difícil que saturin la xarxa i volem donar una total llibertat tant als clients com als serveis que s'executin dintre de la nostra xarxa privada. També podriem fer estancs alguns servidors que podrien tenir la funció de bases de dades internes, però si estan ben securitzades i controlades no hauriem de restringir les seves opcions de xarxa.
+			
+				Per aconseguir aquesta configuració utilitzem iptables. Aquesta comanda permet filtrar els paquets en funció de les seves característiques i també modificar-los per tal de fer NAT. Per a cada una de les regles que hem dit que voliem permetre necessitarem una comanda tal que compleixi els requeriments de seguretat que volem assolir.
+				
+				Per comprovar que la configuració que he fet és la desitjada podem fer servir:
+				
+					#iptables -L
+					
+				La qual ens mostrarà la taula de regles que hem creat i ens permetrà saber si és el que preteniem fer. Per provar aquesta configuració la meva experiència personal ha sigut fer un flush (-F) de les taules, és a dir, borrar-les i provar les comandes específiques a veure si tenia la connectivitat desitjada o es realitzava correctament el port forwarding.
+				
+			- Configuració del tallafocs:
+			
+				El tallafocs que utilitzarem és iptables. Ens permet, donat un equip, filtrar els paquets que volem rebre i si es tracta d'un router podem modificar el forwarding per tal d'evitar accessos no desitjats i privatitzar la nostra xarxa interna. La redirecció de serveis també és possible i podem emmascarar un servei web darrera una ip que en té molts d'altres, per exemple.
+				
+				Les consideracións són les de l'anterior apartat. Tenint en compte això podem veure alguns exemples:
+				
+					#iptables -P INPUT DROP
+					#iptables -P OUTPUT DROP
+					#iptables -P FORWARD DROP
+				
+				Defineixen les polítiques per defecte del router. Si no tenim una regla per tractar un paquet, el descartarem.
+				
+					#iptables -t nat -A POSTROUTING -o eth-troncal -j MASQUERADE
+				
+				Emmascarem darrera nat a qualsevol paquet que tingui com a sortida el dispositiu "eth-troncal".
+					
+					#iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+					#iptables -A FORWARD -m conntrack --ctstate NEW -i eth-dmz -o eth-troncal -j ACCEPT
+					#iptables -A FORWARD -m conntrack --ctstate NEW -i eth-dmz -o eth-dmz -j ACCEPT
+				
+				En la primera permetem el retorn de respostes de comunicacions amb origen dintre la subxarxa o de connexions ja establertes però no deixem entrar connexions noves. Les noves nomes les permetem dintre de la xarxa interna i de dins cap a fora (-i --> -o)
+			
+				Finalment el cas més particular del router extern:
+				
+				#iptables -t nat -A PREROUTING -i eth-troncal -p udp --dport 53 -j DNAT --to-destination 10.10.2.4:53
+				#iptables -t nat -A PREROUTING -i eth-troncal -p tcp --dport 22 -j DNAT --to-destination 10.10.2.11:22
+
+				Amb aquesta comanda fem tant la traducció d'adreça com la redirecció dels paquets, en aquest cas dns i ssh als respectius equips on volem tractar aquests paquets
+				
+				#iptables -A FORWARD -i eth-troncal -p udp --dport 53 -o eth-dmz -m conntrack --ctstate NEW -d 10.10.2.4 -j ACCEPT
+				#iptables -A FORWARD -i eth-troncal -p tcp --dport 22 -o eth-dmz -m conntrack --ctstate NEW -d 10.10.2.11 -j ACCEPT
+				
+				Finalment, acceptem aquests paquets filtrats del prerouting.
+				
+			
+			- Automatització i persistència de les iptables:
+				
+				Per dur a terme l'automatització de les iptables primerrament necessitem saber que tenim les comandes save i restore per tal de guardar i restaurar les iptables:
+				
+					#iptables-save > /etc/iptables/firewall.rules
+					#iptables-restore < /etc/iptables/firewall.rules
+					
+				De tal manera que podem guardar la configuració feta sense haver d'executar nosaltres l'script cada vegada i que abans de reiniciar o apagar també es guardin les possibles noves modificacions que se li hagin fet a la taula.
+				
+				Farem un script tal que quan s'engegui la màquina, s'activi de tal manera que es carreguin les iptables guardades amb la línia:
+				
+					#iptables-restore < /etc/iptables/firewall.rules
+				
+				i el posarem a /etc/network/if-pre-up/iptables.restore.rules.
+				
+				Per guardar les taules actuals abans de reiniciar, hem de modificar els arxius de runlevel 0 i 6 i afegir-hi un soft link a l'script per guardar les iptables:
+				
+					#ln -s /etc/iptables/iptables.d/save.sh /etc/rc0.d/save
+					#ln -s /etc/iptables/iptables.d/save.sh /etc/rc6.d/save
+					#ln -s /etc/iptables/iptables.d/restore.sh /etc/network/if-pre-up.d/restore
+					 *nota: no guardar-los amb cap extensió sinó segurament no s'actualitzarà (run-parts --test /carpeta/a/testejar)
+				
+				per facilitar la restauració de les taules inicials, podem afegir un link al /bin que anomenem firewall que el que fa és tornar a carregar només les regles del nostre script. D'aquesta manera, si hem fet alguna configuració que no funciona simplement executem l'script inicial d'aquesta manera, com si es tractés d'una comanda.
+					
+			- LOGS:
+
+				Per als logs afegirem la línia al fitxer /etc/rsyslog.conf:
+					
+					kern.warn	/var/log/iptables.log
+					
+				per tal d'enregistrar els warnings generats per iptables en un fitxer a part el qual anomenem iptables.log.
+				
+				He fet una configuració senzilla de consideració d'atacs: si hi ha una connexió ssh que no sigui del nostre monitor la mantindrem com a log i per mostrar el potencial de l'script, els pings queden enregistrats de quina màquina s'estan fent.
+				
+				S'executa com un script normal i la sortida serà la dels logs que encara no hagin sigut revisats de tal manera que extaura una línia tal que:
+				
+					(iteració): type:(tipus de log filtrat) from: SRC= (ip) - MAC= (mac, que té un problema de longitud que no he sigut capaç d'arreglar)
+				
+				es pot veure l'exemple a l'arxiu logs.out adjunt.
+
+	Comentaris:
+	
+		- S'ha simplificat la complexitat per tal de demostrar que els coneixaments bàsics s'han assolit però es podrien aplicar moltes millores en temes de control de la xarxa i del que els usuaris poden fer o no poden fer.
+		
+		- Se sap que l'output de l'script de logs no és exacte però la idea s'ha aconseguit plasmar.
+
+		- Posibles millores:
+			1. Scripts iptables: + filtratge intern, + exemples redirecció ports
+			2. Routing diferent per a equips no coneguts, és a dir una altre interfície de xarxa on escoltem el què s'esta fent. 
+			3. Xarxa restringida o intranet
+			4. Afegir proxies
+			5. Afegir serveis reals operatius
+	Correció:
+		
+		Per facilitar la feina, anotaré els canvis realitzats a la pràctica per tal d'aplicar la correció demanada pels punts comentats:
+		
+			- On estan definides les rutes estàtiques?
+				
+				Les rutes estàtiques ja es trobaven definides però faltava esmentar-ho en la pràctica. El fitxer d'interfícies corresponent als routers interns, que són els que necessiten modificar les rutes principalment els hem modificat amb les següents línies per tal que quan s'aixequin la interfície de la dmz en els routers, s'estableixin automàticament les rutes:
+				
+						/etc/network/interfaces.d/dmz
+						#definim les rutes per defecte al router de servidors 
+						post-up ip route add default via 10.10.2.1 dev eth-dmz
+						post-up ip route add 10.10.4.0/28 via 10.10.2.2 dev eth-dmz
+						pre-down ip route del default via 10.10.2.1 dev eth-dmz
+						pre-down ip route del 10.10.4.0/28 via 10.10.2.2 dev eth-dmz
+						
+						/etc/network/interfaces.d/dmz
+						#definim les rutes per defecte al router de clients
+						post-up ip route add default via 10.10.2.1 dev eth-dmz
+						post-up ip route add 10.10.3.0/28 via 10.10.2.3 dev eth-dmz
+						pre-down ip route add default via 10.10.2.1 dev eth-dmz
+						pre-down ip route add 10.10.3.0/28 via 10.10.2.3 dev eth-dmz
+	
+			- Permetre el ping al router extern:
+			
+				Per permetre els pings i només els pings al router extern hem de permetre el tipus de paquet icmp request al input i el icmp reply (0) al output del router extern afegint les següents línies a l'script d'iptables:
+				
+					iptables -A INPUT -p icmp --icmp-type 8 -j ACCEPT
+					iptables -A OUTPUT -p icmp --icmp-type 0 -j ACCEPT
+				
+			- Que el router no tingui output excepte el ping:
+				
+				Amb la política per defecte de DROP ja s'aconsegueix que tot el que no acceptem es descarti.
+				
+			- Masquerade a les xarxes internes innecessari:
+			
+				Certament no hi havia raó per fer dos cops nat en la xarxa plantejada. Senzillament hem eliminat la segona NAT en els routers interns.
+				
+			- Proves de connexió:
+			
+				- Usuari --> INTERNET:
+				
+					Usuari:	#ping www.debian.org
+								PING www.debian.org (130.89.148.14) 56(84) bytes of data.
+								64 bytes from klecker4.snt.utwente.nl (130.89.148.14): icmp_seq=1 ttl=53 time=82.5 ms
+								64 bytes from klecker4.snt.utwente.nl (130.89.148.14): icmp_seq=2 ttl=53 time=81.7 ms
+								64 bytes from klecker4.snt.utwente.nl (130.89.148.14): icmp_seq=3 ttl=51 time=83.1 ms
+								64 bytes from klecker4.snt.utwente.nl (130.89.148.14): icmp_seq=4 ttl=53 time=83.5 ms
+
+								--- www.debian.org ping statistics ---
+								4 packets transmitted, 4 received, 0% packet loss, time 3004ms
+								rtt min/avg/max/mdev = 81.796/82.774/83.581/0.710 ms
+					Router accés: 
+							#tcpdump -t icmp
+								IP 10.0.0.7 > 130.89.148.14: ICMP echo request, id 1940, seq 1, length 64
+								IP 130.89.148.14 > 10.0.0.7: ICMP echo reply, id 1940, seq 1, length 64
+								IP 10.0.0.7 > 130.89.148.14: ICMP echo request, id 1940, seq 2, length 64
+								IP 130.89.148.14 > 10.0.0.7: ICMP echo reply, id 1940, seq 2, length 64
+								IP 10.0.0.7 > 130.89.148.14: ICMP echo request, id 1940, seq 3, length 64
+								IP 130.89.148.14 > 10.0.0.7: ICMP echo reply, id 1940, seq 3, length 64
+								IP 10.0.0.7 > 130.89.148.14: ICMP echo request, id 1940, seq 4, length 64
+								IP 130.89.148.14 > 10.0.0.7: ICMP echo reply, id 1940, seq 4, length 64
+					
+					Podem veure com els paquets surten de la meva interficie eth-troncal (10.0.0.7) cap a la ip de debian i despres tornen.
+					
+				- Usuari --> Servidor:
+					
+					Usuari: #ping bd.servidors.jm
+								PING bd.servidors.jm (10.10.3.2) 56(84) bytes of data.
+								64 bytes from bd.servidors.jm (10.10.3.2): icmp_seq=1 ttl=62 time=0.568 ms
+								64 bytes from bd.servidors.jm (10.10.3.2): icmp_seq=2 ttl=62 time=1.25 ms
+								64 bytes from bd.servidors.jm (10.10.3.2): icmp_seq=3 ttl=62 time=2.12 ms
+								64 bytes from bd.servidors.jm (10.10.3.2): icmp_seq=4 ttl=62 time=1.94 ms
+								--- bd.servidors.jm ping statistics ---
+								4 packets transmitted, 4 received, 0% packet loss, time 3005ms
+								rtt min/avg/max/mdev = 0.568/1.472/2.126/0.616 ms
+
+					En aquesta petita prova de ping entre màquines internes, podem apreciar també el funcionament del domini de la xarxa de servidors, essent la bd.servidors.jm un servidor situat en aquesta. També notem que la ip que respon per la bd és la de la màquina (10.10.3.2) i no la que emmascara el router (10.10.2.3) com era abans perquè hem tret la NAT.
+					
+					
+				- SSH a Monitor des de fora:
+					
+					A part dels logs també podem comprovar com podem accedir des de fora a dintre la xarxa mitjançant ssh:
+						#tcpdump -i eth-troncal port 22
+							15:50:40.860856 IP 10.0.0.5.56564 > 10.0.0.7.ssh: Flags [S], seq 797623434, win 8192, options [mss 1460,nop,wscale 8,nop,nop,sackOK], length 0
+							15:50:40.861222 IP 10.0.0.7.ssh > 10.0.0.5.56564: Flags [S.], seq 3406246870, ack 797623435, win 29200, options [mss 1460,nop,nop,sackOK,nop,wscale 6], length 0
+							15:50:40.861331 IP 10.0.0.5.56564 > 10.0.0.7.ssh: Flags [.], ack 1, win 2053, length 0
+							15:50:40.861534 IP 10.0.0.5.56564 > 10.0.0.7.ssh: Flags [P.], seq 1:68, ack 1, win 2053, length 67
+							15:50:40.861693 IP 10.0.0.7.ssh > 10.0.0.5.56564: Flags [.], ack 68, win 457, length 0
+							15:50:40.865807 IP 10.0.0.7.ssh > 10.0.0.5.56564: Flags [P.], seq 1:40, ack 68, win 457, length 39
+							15:50:40.867944 IP 10.0.0.5.56564 > 10.0.0.7.ssh: Flags [P.], seq 68:772, ack 40, win 2052, length 704
+							15:50:40.868095 IP 10.0.0.7.ssh > 10.0.0.5.56564: Flags [P.], seq 40:992, ack 772, win 479, length 952
+							15:50:40.891193 IP 10.0.0.5.56564 > 10.0.0.7.ssh: Flags [P.], seq 772:1052, ack 992, win 2049, length 280
+							15:50:40.899192 IP 10.0.0.7.ssh > 10.0.0.5.56564: Flags [P.], seq 992:1424, ack 1052, win 501, length 432
+							15:50:40.949883 IP 10.0.0.5.56564 > 10.0.0.7.ssh: Flags [.], ack 1424, win 2047, length 0
+							15:50:42.452855 IP 10.0.0.5.56564 > 10.0.0.7.ssh: Flags [P.], seq 1052:1256, ack 1424, win 2047, length 204
+							15:50:42.453170 IP 10.0.0.7.ssh > 10.0.0.5.56564: Flags [P.], seq 1424:1476, ack 1256, win 523, length 52
+							15:50:42.453443 IP 10.0.0.5.56564 > 10.0.0.7.ssh: Flags [P.], seq 1256:1372, ack 1476, win 2053, length 116
+							15:50:42.455022 IP 10.0.0.7.ssh > 10.0.0.5.56564: Flags [P.], seq 1476:1528, ack 1372, win 523, length 52
+							15:50:42.505184 IP 10.0.0.5.56564 > 10.0.0.7.ssh: Flags [.], ack 1528, win 2052, length 0
+						
+						#tcpdump -i eth-dmz port 22
+							15:52:47.396275 IP 10.0.0.5.56588 > 10.10.2.11.ssh: Flags [S], seq 574785735, win 8192, options [mss 1460,nop,wscale 8,nop,nop,sackOK], length 0
+							15:52:47.396459 IP 10.10.2.11.ssh > 10.0.0.5.56588: Flags [S.], seq 3088164186, ack 574785736, win 29200, options [mss 1460,nop,nop,sackOK,nop,wscale 6], length 0
+							15:52:47.396625 IP 10.0.0.5.56588 > 10.10.2.11.ssh: Flags [.], ack 1, win 2053, length 0
+							15:52:47.396780 IP 10.0.0.5.56588 > 10.10.2.11.ssh: Flags [P.], seq 1:68, ack 1, win 2053, length 67
+							15:52:47.396967 IP 10.10.2.11.ssh > 10.0.0.5.56588: Flags [.], ack 68, win 457, length 0
+							15:52:47.402340 IP 10.10.2.11.ssh > 10.0.0.5.56588: Flags [P.], seq 1:40, ack 68, win 457, length 39
+							15:52:47.402851 IP 10.0.0.5.56588 > 10.10.2.11.ssh: Flags [P.], seq 68:772, ack 40, win 2052, length 704
+							15:52:47.403021 IP 10.10.2.11.ssh > 10.0.0.5.56588: Flags [P.], seq 40:992, ack 772, win 479, length 952
+							15:52:47.423511 IP 10.0.0.5.56588 > 10.10.2.11.ssh: Flags [P.], seq 772:1052, ack 992, win 2049, length 280
+							15:52:47.431467 IP 10.10.2.11.ssh > 10.0.0.5.56588: Flags [P.], seq 992:1424, ack 1052, win 501, length 432
+							15:52:47.481946 IP 10.0.0.5.56588 > 10.10.2.11.ssh: Flags [.], ack 1424, win 2047, length 0
+					
+					En la primera captura podem veure que el router d'accés interactua amb la màquina host (10.0.0.5) i en la segona podem veure que es fa el forwarding a la màquina monitor (10.10.2.11) i que un cop ens autentiquem, efectivament ens trobem a la màquina monitor i no al router.
+					
+				- Ping al router des de fora:
+					
+					Veiem que després d'acceptar els pings, podem comprovar des de la màquina host que la nostra entrada a la xarxa o router d'accés permet la seva visibilitat.
+					
+					C:\Users\mestr>ping 10.0.0.7
+
+						Haciendo ping a 10.0.0.7 con 32 bytes de datos:
+						Respuesta desde 10.0.0.7: bytes=32 tiempo<1m TTL=64
+						Respuesta desde 10.0.0.7: bytes=32 tiempo<1m TTL=64
+						Respuesta desde 10.0.0.7: bytes=32 tiempo<1m TTL=64
+						Respuesta desde 10.0.0.7: bytes=32 tiempo<1m TTL=64
+
+						Estadísticas de ping para 10.0.0.7:
+							Paquetes: enviados = 4, recibidos = 4, perdidos = 0
+							(0% perdidos),
+						Tiempos aproximados de ida y vuelta en milisegundos:
+							Mínimo = 0ms, Máximo = 0ms, Media = 0ms
+				
+	Llocs d'interès:
+
+	https://wiki.debian.org/DebianFirewall
+	https://wiki.debian.org/es/iptables
+	http://www.netfilter.org/documentation/HOWTO/es/packet-filtering-HOWTO-7.html

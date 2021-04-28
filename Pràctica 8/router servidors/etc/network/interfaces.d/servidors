@@ -1,0 +1,7 @@
+auto eth-servidors
+allow-hotplug eth-servidors
+iface eth-servidors inet static
+	address 10.10.3.1
+	netmask 255.255.255.240
+
+	

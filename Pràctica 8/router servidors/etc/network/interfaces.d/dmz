@@ -1,0 +1,11 @@
+auto eth-dmz
+allow-hotplug eth-dmz
+iface eth-dmz inet static
+	address 10.10.2.3
+	netmask 255.255.255.240
+	gateway 10.10.2.1	
+	#definim les rutes per defecte
+	post-up ip route add default via 10.10.2.1 dev eth-dmz
+	post-up ip route add 10.10.4.0/28 via 10.10.2.2 dev eth-dmz
+	pre-down ip route del default via 10.10.2.1 dev eth-dmz
+	pre-down ip route del 10.10.4.0/28 via 10.10.2.2 dev eth-dmz

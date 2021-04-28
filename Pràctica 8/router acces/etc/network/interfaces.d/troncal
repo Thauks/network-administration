@@ -1,0 +1,3 @@
+auto eth-troncal
+allow-hotplug eth-troncal
+iface eth-troncal inet dhcp

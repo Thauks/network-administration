@@ -1,0 +1,7 @@
+auto eth-clients
+allow-hotplug eth-clients
+iface eth-clients inet static
+	address 10.10.4.1
+	netmask 255.255.255.240
+
+	
