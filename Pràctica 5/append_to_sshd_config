@@ -1,0 +1,7 @@
+AllowUsers usuari
+
+Match group sftp
+	ChrootDirectory /services/sftp
+	ForceCommand internal-sftp
+	PasswordAuthentication yes
+	AllowTCPForwarding no

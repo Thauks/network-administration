@@ -1,0 +1,25 @@
+
+ Domini: seax.edu
+________________________________________________________________________________________
+
+ - Informacio general del domini
+	dns2.seax.edu.	-->	ipv4: 10.0.0.4	ipv6: 
+	dns1.seax.edu.	-->	ipv4: 10.0.0.3	ipv6: 
+
+ - Start of Authority
+	Servidor Primari: 		dns1.seax.edu.
+	Responsable del domini: 	root.seax.edu.
+	Serial: 			2017051801
+	Refresh: 			3600
+	Retry: 				600
+	Expires: 			86400
+	Negative cache TTL: 		600
+
+ - Servidors de Correu del domini
+	dns1.seax.edu.	-->	ipv4: 10.0.0.3	ipv6: 
+
+ - Servidors web del domini
+	No no hi ha servidor web www.seax.edu
+
+ - Servidors web del domini
+	No no hi ha servidor ftp ftp.seax.edu

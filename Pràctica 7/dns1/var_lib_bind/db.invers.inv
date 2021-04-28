@@ -1,0 +1,17 @@
+@	IN	SOA	dns1.seax.edu. root.dns1.seax.edu. (
+			2017051801	; Serial
+			      3600	; Refresh [1h]
+			       600	; Retry	[10m]
+			     86400	; Expire [1d]
+			       600 )	; Negative Cache TTL [1h]
+;
+
+;name servers
+
+@		IN	NS	dns1.seax.edu.
+@		IN	NS	dns2.seax.edu.
+
+;adreces dels servidors
+
+3		IN	PTR	dns1.seax.edu.
+4		IN	PTR	dns2.seax.edu.

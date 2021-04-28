@@ -1,0 +1,162 @@
+Pràctica 7 - Implementar un servei de Noms de Domini (DNS)
+
+Fitxers involucrats:
+		/etc/bind/
+					named.conf:					Fitxer de configuració principal que inclou els fitxers mencionats tot seguit.
+					named.conf.default-zones: 	Permet la resolució de les zones per defecte com localhost
+					named.conf.options:			Opcions pel nostre servidor DNS
+					named.conf.local:			Permet declarar zones.
+		/etc/network/interfaces
+		debian_dnsinfo.txt	--> resultat de l'script executat contra debian.org
+		debian_dnsinfo.txt  --> resultat de l'script executat contra seax.edu
+
+Escenari:
+	Abans de començar l'escenari que muntarem en aquesta pràctica és un escenari només amb dues màquines i cada una tindrà la responsabilitat de master i slave depenent del domini en el qual treballi:
+	
+				  DNS1: 10.0.0.3       DNS2: 10.0.0.4
+				+------------------+ +------------------+
+				|                  | |                  |
+				| Master de:       | | Master de:       |
+				|                  | |                  |
+				|    seax.edu      | |  classe.seax.edu |
+				|    zona inversa  | |                  |
+				|                  | | Slave de:        |
+				| Slave de:        | |                  |
+				|                  | |    seax.edu      |
+				|  classe.seax.edu | |    zona inversa  |
+				|                  | |                  |
+				+------------------+ +------------------+
+
+1- Configurar un servei de DNS.
+
+		Primerament instalem el paquet bind9 de debian per tal de poder oferir el servei que desitgem:
+			#apt-get install bind9
+		Un cop instal·lat tenim els fitxers que ens permeten modificar la configuració del servei al /etc/bind. Clonem la màquina per tal de tenir els dos servidors dns, el primari i el secundari.
+		
+		Ens interessa que tinguin ip estàtica amb la qual cosa podem definir-ho en el fitxer d'interfícies:
+				
+				DNS1
+					allow-hotplug eth0
+					iface eth0 inet static
+						address 10.0.0.3
+						netmask 255.255.255.0
+						gateway 10.0.0.1
+						broadcast 10.0.0.255
+				
+				DNS2
+					allow-hotplug eth0
+					iface eth0 inet static
+						address 10.0.0.4
+						netmask 255.255.255.0
+						gateway 10.0.0.1
+						broadcast 10.0.0.255
+						
+		Podem canviar els hostnames de les màquines per mantenir la coherència amb la pràctica i anomenar-les dns1 i dns2 respectivament.
+		
+		- Es defineixen un domini principal "seax.edu" i un subdomini "classe.seax.edu".
+		
+			Per a definir els dominis hem de configurar el fitxer de zones DNS /etc/bind/named.conf.local
+			
+			Definim les dues zones directes seax.edu i classe.seax.edu com a master i slave respectivament al dns1 i al revés al dns2. 
+			
+				zone "seax.edu" {
+					type master;
+					file "/var/lib/bind/db.seax.edu";
+					//forwarders {};
+				};
+
+				zone "classe.seax.edu" {
+					type slave;
+					file "/var/lib/bind/db.classe.seax.edu";
+					masters{
+						10.0.0.4;
+					};
+					//forwarders {};
+				};
+			Seguidament també s'ha de declarar la zona inversa que ens permetrà associar una direcció ip a un nom.
+				zone "0.0.10.in-addr.arpa" {
+						type master;
+						file "/var/lib/bind/db.invers.inv";
+						//forwarders {};
+				};
+				
+			En acabar, canviem la opció forwarders del fitxer /etc/bind/named.conf.options:
+				forwarders {
+					208.67.222.222;
+				};
+			
+			Finalment cal crear els fitxers de zona inclosos en el /etc/bind/named.conf.local:
+				#touch /var/lib/bind/db.seax.edu
+				#touch /var/lib/bind/db.invers.inv
+			i en el dns2:
+				#touch /var/lib/bind/db.classe.seax.edu
+				
+			Aquests fitxers són els en els quals s'assignen els noms de les zones i els noms de les màquines, és a dir, contenen la informació per a poder resoldre les queries fetes contra el dns.
+			
+			Per exemple el de seax.edu:
+			
+				seax.edu.			IN	NS	dns1.seax.edu.
+				seax.edu.			IN	NS	dns2.seax.edu.
+				classe.seax.edu.	IN	NS	dns1.classe.seax.edu.
+				classe.seax.edu.	IN	NS	dns2.classe.seax.edu.
+
+				;adreces dels servidors
+
+				dns1					IN	A	10.0.0.3
+				dns2					IN	A	10.0.0.4
+				dns1.classe.seax.edu.	IN	A	10.0.0.3
+				dns2.classe.seax.edu.	IN	A	10.0.0.4
+				
+			A dalt podem veure com declarem el nameserver pel domini seax.edu i per classe.seax.edu i a sota es pot veure les adreces ip que se'ls dona a cada servidor. Shan declarat dos cops, una per cada domini. 
+		
+		- Cal permetre la recursivitat només a les xarxes pròpies.
+		
+			Per a permetre la recursivitat només en les xarxes internes hem de declarar un acl (acces control list) per tal de dir quin rang volem que sigui la llista que volem gestionar com a conjunt d'adreces a tractar de la mateixa manera. El que hem de fer és afegir la següent línia al fitxer /etc/bind/named.conf:
+			
+			acl propies { 
+				127.0.0.1/8; //resolucions internes
+				10.0.0.0/24; //xarxa pròpia
+			};
+			
+			i després permetre la recursivitat (en el fitxer /etc/bind/named.options) a les dues subxarxes que acabem de definir:
+			
+			allow-recursion { propies; };
+			allow-query { propies; }
+		
+		- Cal verificar el funcionament dels dominis.
+		
+			Per a verificar el funcionament dels dominis tenim diferentes eines que ens permeten des de comprovar la sintaxi dels fitxers de configuració a eines que permeten veure si el dns resol correctament els dominis.
+			
+			- Sintaxi de fitxers:
+				Test de la configuració del dns:
+					#named-checkconf /etc/named.conf
+				Test de la configuració de les zones:
+					#named-checkzone seax.edu /var/named/db.seax.edu
+			
+			- Resolució del dns: dig i nslookup (dig dóna més informació)
+				dig @servidor_al_que_volem_preguntar -t (tipus) domini
+				Preguntar per adreces:
+					dig @10.0.0.3 -t A dns1.seax.edu
+					dig @10.0.0.3 -t A mail.seax.edu
+					dig @10.0.0.4 dns1.classe.seax.edu
+					...
+				Preguntes inverses:
+					dig @10.0.0.3 -x 10.0.0.4
+					dig @10.0.0.4 -x 10.0.0.3
+					...
+			- Extra:
+				Podem consultar l'estat i reiniciar el servei del servidor amb les comandes que ofereix el service.				
+					#service bind9 restart
+					#service bind9 stop
+					#service bind9 status
+				
+Llocs d'interès:
+	https://wiki.debian.org/Bind9
+	http://stackoverflow.com/questions/22440582/difference-between-a-dns-zone-and-dns-domain
+	http://vensign.com/instalar-configurar-un-servidor-dns-con-bind9-en-debian-etch/
+	http://www.tldp.org/HOWTO/DNS-HOWTO-7.html
+	https://help.ubuntu.com/community/BIND9ServerHowto
+	http://www.aboutdebian.com/dns.htm
+	http://www.elinuxbook.com/how-to-configure-secondary-dns-server-with-bind-in-linux/
+	http://www.zytrax.com/books/dns/ch9/subdomain.html
+	https://www.linux.com/learn/check-your-dns-records-dig

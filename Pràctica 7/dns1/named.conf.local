@@ -1,0 +1,28 @@
+
+zone "seax.edu." {
+	type master;
+	file "/var/lib/bind/db.seax.edu";
+	//forwarders {};
+	allow-transfer { 10.0.0.4; };
+	
+};
+
+zone "classe.seax.edu." {
+	type slave;
+	file "/var/lib/bind/db.classe.seax.edu";
+	masters{
+		10.0.0.4;
+	};
+	//forwarders {};
+	
+};
+
+zone "0.0.10.in-addr.arpa." {
+		type master;
+		file "/var/lib/bind/db.invers.inv";
+		//forwarders {};
+		allow-transfer { 10.0.0.4; };
+};
+
+//include "/etc/bind/zones.rfc1918";
+

@@ -1,0 +1,32 @@
+;
+; seax.edu
+;
+
+$TTL	3600
+@	IN	SOA	dns1.seax.edu. root.seax.edu. (
+			2017051801	; Serial
+			      3600	; Refresh [1h]
+			       600	; Retry	[10m]
+			     86400	; Expire [1d]
+			       600 )	; Negative Cache TTL [1h]
+;
+
+;name servers
+
+seax.edu.		IN	NS	dns1.seax.edu.
+seax.edu.		IN	NS	dns2.seax.edu.
+classe.seax.edu.	IN	NS	dns1.classe.seax.edu.
+classe.seax.edu.	IN	NS	dns2.classe.seax.edu.
+
+;adreces dels servidors
+
+dns1			IN	A	10.0.0.3
+dns2			IN	A	10.0.0.4
+dns1.classe.seax.edu.	IN	A	10.0.0.3
+dns2.classe.seax.edu.	IN	A	10.0.0.4
+
+;
+
+		IN	MX	5	dns1.seax.edu.
+mail		IN	CNAME	dns1
+

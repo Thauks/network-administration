@@ -1,0 +1,29 @@
+#dhclient -r -v eth2
+---------------------------------------------------------------
+Killed old client process
+Internet Systems Consortium DHCP Client 4.3.1
+Copyright 2004-2014 Internet Systems Consortium.
+All rights reserved.
+For info, please visit https://www.isc.org/software/dhcp/
+
+Listening on LPF/eth2/08:00:21:00:00:02
+Sending on   LPF/eth2/08:00:21:00:00:02
+Sending on   Socket/fallback
+DHCPRELEASE on eth2 to 10.0.1.1 port 67
+
+
+#dhclient -v eth2
+---------------------------------------------------------------
+Internet Systems Consortium DHCP Client 4.3.1
+Copyright 2004-2014 Internet Systems Consortium.
+All rights reserved.
+For info, please visit https://www.isc.org/software/dhcp/
+
+Listening on LPF/eth2/08:00:21:00:00:02
+Sending on   LPF/eth2/08:00:21:00:00:02
+Sending on   Socket/fallback
+DHCPDISCOVER on eth2 to 255.255.255.255 port 67 interval 8
+DHCPREQUEST on eth2 to 255.255.255.255 port 67
+DHCPOFFER from 10.0.1.1
+DHCPACK from 10.0.1.1
+bound to 10.0.1.13 -- renewal in 19742 seconds.

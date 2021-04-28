@@ -1,0 +1,158 @@
+Pràctica 6 - Implementar un servei DHCP
+
+Fitxers involucrats:
+	/etc/default/isc-dhcp-server--> conté els path i interfícies que serveix
+	/etc/dhcp/dhcpd.conf        --> conté la configuració del servidor dhcp
+	/var/lib/dhcp/dhcpd.leases  --> conté les adreces donades a les mac
+	/etc/network/interfaces
+
+Fitxers adjunts involucrats:
+	accions.txt				--> aquest fitxer
+	dhclient_output.txt		--> output referència dhclient
+	dhcp.conf				--> copia de /etc/dhcp/dhcpd.conf del servidor
+	dhcp.leases				--> copia de /var/lib/dhcp/dhcpd.leases del servidor
+	interfaces				--> copia de /etc/network/interfaces
+	isc-dhcp-server			--> copia de /etc/default/isc-dhcp-server
+	REL_DISC.pcap			--> captura de paquets DHCP en una xarxa
+	server_al108.pcap		--> captura per demostrar el servei en la xarxa al108
+	server_al117.pcap		--> captura per demostrar el servei en la xarxa al117
+	
+1- Configurar un servidor DHCP.
+
+    Volem configurar un servidor de DHCP que doni servei a les xarxes que ho necessitin. En aquesta pràctica es crearà un petit escenari per comprovar que funciona.
+
+    Muntarem el següent escenari per comprovar el funcionament:
+
+                      Main network: 10.0.0.0/24
+
+              if:eth-al108  +------------+   if: eth-al117
+                          +-|DHCP  Server|--+
+                          | +------------+  |
+                          |      			|
+                          |                 |
+      Subnet1 10.0.1.0/24 |                 | Subnet2 10.0.2.0/28
+                     +---------+       +---------+
+                     |  AL108  |       |  AL117  |
+                     +----+----+       +----+----+
+                          |                 |
+                     +----+----+       +----+----+--------+
+                     |         |       |         |        |
+                     +         +       +         +        +
+                   Jordi     Rafa    Joan      Albert   Samba
+
+                        Clients de cada subnet
+
+    On:
+        - DHCP Server serà una màquina virtual actuant com a servidor dhcp i juntament amb Jordi, Rafa, Joan, Albert i un servidor samba (que tindrà ip fixa)actuant com a clients.
+		
+        - AL108 i AL117 representen dues subxarxes diferents amb diferents rangs d'IP's
+		
+        - El servidor dhcp tindrà mínim 2 adaptadors de xarxa en mode xarxa interna:
+            > Un a la subxarxa al108
+            > Un a la subxarxa al117
+            (pot tenir un 3r en mode NAT o xarxa NAT per seguir treballant amb connexió)
+        - Es recomana canviar les MAC a adreces conegudes per reconeixer amb més facilitat els equips connectats.
+
+
+    Instal·lem el paquet de servei dhcp:
+        #apt-get install isc-dhcp-server
+    Aclarem quina interfície és cada una canviant el nom i utilitzant la mac com a referència:
+        #ip a //ens permet saber quines interficies existeixen i quina mac tenen
+        #ip link set INTERFICIE name NOU_NOM
+    i.e.#ip link set eth1 name eth-al108
+        #ip link set eth2 name eth-al117
+	Si es desitgés que els canvis fossin permanents en els noms de les interfícies podriem canviar els noms al camp NAMES al fitxer dels udev:
+		#nano /etc/udev/rules.d/70-persistent-net.rules
+			SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="08:00:27:00:00:01", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="eth-main"
+			
+			SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="08:00:27:00:00:02", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="eth-al108"
+			
+			SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="08:00:27:00:00:03", ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="eth-al117"
+	
+    Editar el fitxer /etc/default/isc-dhcp-server i afegir les noves interficies:
+        #nano /etc/default/isc-dhcp-server
+        (modificar el fitxer) INTERFACES="eth-al108 eth-al117"
+    Configurar adequadament el fitxer /etc/network/interfaces:
+        (fer una ullada al fitxer adjuntat interfaces)
+        #service networking restart
+    Modificar el fitxer de configuració de dhcp:
+        #nano /etc/dhcp/dhcpd.conf
+        (veure fitxer adjunt dhcpd.conf)
+        #service isc-dhcp-server restart
+    (comanda per comprovar els errors de sintaxi)
+        #dhcpd -t -cf /etc/dhcp/dhcpd.conf
+
+    Comentari sobre el fitxer dhcpd.conf:
+		
+			option domain-name "seax.edu";
+			option domain-name-servers 8.8.8.8, 8.8.4.4;
+		Les dues línies anteriors permeten definir els dns que s'utilitzaran i les seves direccions. Veiem que el domini és seax.edu però com que encara no tenim els dns de la pràctica 7 posem els de google.
+		
+        Elegim la subxarxa en la qual volem donar un servei d'adreces:
+            subnet 10.0.1.0 netmask 255.255.255.0 {}
+        Podem donar un rang de direccions en funció de com vulguem repartir les adreces lliures:
+            range 10.0.1.10 10.0.1.254
+        El què fariem en aquest cas és donar adreces dins l'interval *.10 - *.254. La opció de routers permet canviar l'equip que fa l'enrutament i en el cas dels dispositius no coneguts podriem adreçar-los a un altre router que no fos el principal. Ens permetria saber què és el que està fent l'usuari que desconeixem augmentant la seguretat de la xarxa.
+
+        Si volem un funcionament més avançat del dhcp podem definir hosts coneguts
+        com:
+                host Joan {
+                  hardware ethernet 08:00:21:00:00:03;
+                }
+        i també assignar-los adreces fixes si escau:
+                host samba {
+                  hardware ethernet 08:00:00:00:00:10;
+                  fixed-address 10.0.2.2;
+                }
+
+        Una vegada definits els hosts, podem fer actuar el dhcp en funció de si els coneixem o no amb les regles deny/allow unknown-hosts per tal de tractar-los diferent segons si els coneixem o no.
+        
+		Podem definir adreces de broadcast i de routing amb els parametres:
+			option broadcast-address i option routers
+        També podem definir el temps que volem que les adreces siguin vàlides:
+        
+			  default-lease-time 600;
+			  max-lease-time 3600;
+        
+        Una altre opció interessant que permet la configuració del servidor dhcp és fer pools d'adreces. Aquesta opció ens permet tractar un grup d'adreces definides en un rang de la xarxa o subxarxa diferent a un altre rang d'adreces aixi definint certes adreces per equips coneguts, més freqüents o el que es desitgi. Per exemple:
+        
+                #known hosts
+            pool {
+                range 10.0.2.4 10.0.2.10;
+                deny unknown-clients;
+            }
+
+            #unknown hosts
+            pool {
+                range 10.0.2.11 10.0.2.14;
+                allow unknown-clients;
+            }
+        
+        El què permeten aquestes línies és separar els hosts coneguts i assignar-los ip en el rang .4 -.10 i només admetre 3 hosts no coneguts. Per aquests últims podríem desviar el transit a un altre router més segur o més llunyà per no saturar el que realment utilitzen els hosts coneguts.
+		
+			authoritative;
+		
+		Suposa que els canvis definits en el servidor DHCP són els correctesi intentarà reassignar els clients mal configurats.
+
+2- Verificar el seu bon funcionament.
+    - Proves de funcionament i verificacions:
+		S'han adjuntat dues captures de xarxa, una per cada xarxa configurada, on podem veure la interacció entre clients que tenen la ip 0.0.0.0 i fan una petició al nostre servidor (que està alhora escoltant amb tcpdump) el qual els respon donant-los una ip en el rang que s'ha establert en l'anterior apartat.
+		
+		Podem veure també un DHCPRELEASE que significa que un client comunica que allibera la ip. Ho podem aconseguir abaixant la interfície (#ifdown eth2) o amb el client de dhcp (#dhclient -r -v eth2) on el paràmetre '-r' indica que volem enviar un release i el '-v' és un verbose per a poder veure els missatges. Fitxer dhclient_output.txt capturat de la següent manera: 
+			#dhclient -r -v eth2 &> dhclient_output.txt
+			#dhclient -v eth2 &>> dhclient_output.txt
+		Cal aclarar-ho ja que el verbose imprimeix per pantalla pel canal d'error i per això s'ha d'afegir l'ampersan a la redirecció.
+		
+		En dhclient_output.txt apreciem el DHCPRELEASE per una banda i per laltra podem apreciar el DHCPDISCOVER, DHCPOFFER i DHCPACK la qual cosa ens guia la conclusió que el servidor està oferint ips i a l'hora tenint constància de qui les allibera i qui no. Podem veure aquesta mateixa interacció per captura de xarxa (REL_DISC.pcap) i el resultat és el mateix que ens ha mostrat el verbose del dhclient.
+        
+        Una altra forma de comprovar que el servei que dona el nostre servidor és fent un reboot del servei de xarxa (service networking restart) al client. Aquest el què fa és reiniciar les interficies (prèviament configurades amb el praràmetre que admet dhcp. Veure interfaces_clietn) i veurem que les ip possiblement no hagin variat perquè encara eren vàlides dins la configuració del dhcp, ja que aquest té un temps màxim de validesa de 3600 segons per ip. Fent un reboot sencer obtindriem el mateix resultat.
+		
+		Finalment, es pot acabar de confirmar la correcta configuració i el correcte funcionament amb el fitxer adjunt copia del /var/lib/dhcp/dhcpd.leases que mostra les ip que el servidor ha donat juntament amb les mac i si aquestes estan lliberades o no. Aquest fitxer manté totes les ip otorgades a les xarxes incloses totes les proves realitzades, així es pot comprovar com es van alliberant quan l'equip es desconnecta.
+        
+
+https://www.virtualbox.org/manual/ch06.html
+https://wiki.debian.org/DHCP_Server
+http://asciiflow.com/
+https://linux.die.net/man/5/dhcpd.conf
+https://linux.die.net/man/8/dhclient
+https://askubuntu.com/questions/420981/how-do-i-save-terminal-output-to-a-file/420983

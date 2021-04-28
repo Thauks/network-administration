@@ -1,0 +1,28 @@
+
+ Domini: debian.org
+________________________________________________________________________________________
+
+ - Informacio general del domini
+	sec2.rcode0.net.	-->	ipv4: 176.97.158.100	ipv6: 2001:67c:10b8::100
+	dnsnode.debian.org.	-->	ipv4: 194.146.106.126	ipv6: 2001:67c:1010:32::53
+	sec1.rcode0.net.	-->	ipv4: 192.174.68.100	ipv6: 2001:67c:1bc::100
+
+ - Start of Authority
+	Servidor Primari: 		denis.debian.org.
+	Responsable del domini: 	hostmaster.debian.org.
+	Serial: 			2017052804
+	Refresh: 			1800
+	Retry: 				600
+	Expires: 			1814400
+	Negative cache TTL: 		600
+
+ - Servidors de Correu del domini
+	mailly.debian.org.	-->	ipv4: 82.195.75.114	ipv6: 2001:41b8:202:deb:6564:a62:52c3:4b72
+	muffat.debian.org.	-->	ipv4: 209.87.16.33	ipv6: 2607:f8f0:614:1::1274:33
+
+ - Servidors web del domini
+	www.debian.org	--> 5.153.231.4
+	www.debian.org	--> 130.89.148.14
+
+ - Servidors web del domini
+	ftp.debian.org	--> 130.89.148.12

@@ -1,0 +1,215 @@
+Pràctica  5 - Accés al servidor mitjançant SFTP, NFS i SAMBA
+
+Fitxers involucrats:
+/etc/ssh/sshd_config --> configuració paràmetres sftp
+append_to_sshd_config --> línies a afegir al fitxer sshd_config
+/etc/passwd --> comprovació de homes i grups
+/etc/group  --> comprovació de grups
+
+/etc/exports --> enumera els directoris que estaran disponibles a la xarxa
+/etc/fstab	--> per fer l'automuntatge
+
+/etc/samba/smb.conf --> configuració de samba
+
+fitxers dins de la pràctica:
+	accions.txt --> aquest fitxer
+	sftp 				--> captura sense filtrar de la prova sftp
+	nfs 				--> captura sense filtrar de la prova nfs
+	samba 			--> captura sense filtrar de la prova samba
+	sftp_service.pcap 	--> captura filtrada de la prova sftp
+	nfs_service.pcap 		--> captura filtrada de la prova nfs
+	samba_service.pcap 	--> captura filtrada de la prova samba
+
+1- Configurar sftp
+
+		Volem configurar un servei de sftp amb opcions de chroot i sense servei ssh per a un usuari concret. Per a demostrar-ho, crearem un usuari de proves per a testejar el chroot o jail.
+
+		S'asumeix que la configuració de SSH és la óptima per al servei i es recomana seguir per ordre les següents comandes.
+
+		Creem una carpeta per emmagatzemar dades referents als serveis que ofereix el servidor.
+			#mkdir /services
+		I una per al servei sftp
+			#mkdir /services/sftp
+		Creem la carpeta home de l'usuari que utilitzarà el servei:
+			#mkdir -p /services/sftp/usuari
+		Creem un grup per afegir els usuaris que tindran accés sl servei sftp.
+			#groupadd sftp
+		Creem un usuari nou amb el directori a la carpeta creada, l'afegim al grup i el deixem sense shell perquè no pugui fer login SSH però si sftp.
+			#useradd -g sftp -d /services/sftp/usuari usuari
+			#passwd usuari
+			#usermod -s /bin/nologin usuari (també podriem posar-li rbash)
+
+		Canviem de propietari les carpetes /services i /services/sftp a root ja que es requereix per debian per mantenir la coherència de l'estructura de directoris.
+			#chown root:root /services
+			#chown root:root /services/sftp
+		i ens assegurem que tenen els permisos 755
+			#chmod 755 /services
+			#chmod 755 /services/sftp
+		Donem permisos de grup i usuari a la carpeta i canviem usuari i grup:
+			#chmod 770 /services/sftp/usuari
+			#chown usuari:sftp /services/usuari
+
+		Un cop preparat l'usuari i grup, configurem el fitxer /eetc/ssh/sshd_config
+			#nano /etc/ssh/sshd_config
+		i afegim:
+
+		AllowUser usuari
+		(Comentem la opcio Subsystem sftp sftp-server i afegim la següent)
+		Subsystem sftp internal-sftp (aquesta comanda és la que ens permet accedir al directori de chroot sense tenir els fitxers essencials de sh i els dispositius	per defecte de debian)
+
+		Match group sftp
+			ChrootDirectory /services/sftp  <-- directori on es farà el jail
+		  	ForceCommand internal-sftp
+			PasswordAuthentication yes
+
+		si es vol afegir un altre usuari al jail amb la seva carpeta personal només se li ha de fer un home nou dintre de sftp i configurar els parametres de l'usuari igual
+		que s'ha mostrat.
+
+		IMPORTANT: no emmagatzemar fitxers en una carpeta home sense els owners adequats o hi podria haver conflicte de permisos a l'hora de connectar-se.
+
+		Finalment, les comprovacions fetes a la màquina client:
+		#sftp usuari@host
+		En el shell de sftp podem fer servir la comanda pwd que retorna la ruta actual, si aquesta retorna una "/", vol dir que veu que la carpeta /services/sftp és l'arrel amb la qual cosa s'haurà aconseguit fer el jail satisfactoriament.
+
+		Per a muntar el servei sftp necessitem el paquet sshfs:
+			#apt-get install sshfs
+		Crear la carpeta on voldrem el servei:
+			#mkdir -p /mnt/sftp
+		Podem muntar el servei sftp amb la en una carpeta amb la comanda:
+			#sshfs -o allow_other,defer_permissions usuari@host:/ /mnt/sftp
+		o bé:
+			#sshfs -o allow_other,defer_permissions,IdentityFile=~/.ssh/id_ed25519 usuari@host:/ /mnt/sftp
+		En el cas que hi hagués encriptació de clau pública com la que es va veure a la pràctica 4.
+		
+		També podem fer que es munti sol al arrancar amb el fitxer fstab:
+			#nano /etc/fstab
+		Afegim la següent línia pel nostre cas:
+			usuari@host:/ /mnt/sftp  fuse.sshfs noauto,x-systemd.automount,_netdev,users,idmap=user,IdentityFile=/home/usuari/.ssh/id_ed25519,allow_other,reconnect 0 0
+	
+Captura de xarxa:
+		Fem referència a la captura sftp_service on podem apreciar l'intercanvi de missatges que es realitza. Si mirem la captura completa veiem les comunicacions tcp pel port 22 que correspon al que hem utilitzat per desplegar el servei sftp.
+
+		En la captura filtrada, podem diferenciar 3 parts: el agreement (paquets 1 i 2), el key exchange (3-7) i els missatges que s'han intercanviat durant la sessió ssh que van tots encriptats. El protocol que es fa servir és el SSHv2 per tant es	confirma el que es podria esperar; el servei sftp va per sota el protocol ssh.
+
+2- Configurar nfs
+
+			L'objectiu és configurar un servei nfs en una carpeta la qual es podrà accedir remotament a través de la xarxa al nostre sistema d'arxius.
+
+			Dins de la carpeta services que hem creat abans crearem la nfs:
+				#mkdir /services/nfs
+			En el servidor instal·lem el servei de servidor de nfs:
+				#apt-get install nfs-kernel-server
+			Això afegeix a la carpeta etc, el fitxer exports que és el que s'ha d'editar.
+			Afegirem la següent línia per a provar que som capaços de muntar un nfs:
+			/services/nfs							10.0.0.0/24(rw,fsid=0,root_squash,sync,no_subtree_check)
+			(carpeta que compartim)		(xarxa on la compartim)
+
+			Les opcions utilitzades són:
+
+			rw: permet llegir i escriure al contrari que ro que nomes permet llegir fsid=0: indica que és el directori arrel root_squash: permet evitar que les consultes provinguin d'un usuari root, transformant-les	en consultes de l'usuari nobody que no té els mateixos permisos.
+			
+			sync: replica les dades als clients un cop son estables.
+			
+			no_subtree_check: elimina les comprovacions dels subarbres del sistema de fitxers.
+
+			A més a més tenim opcions interessants com:
+			sec: basada en Kerberos que permet establir el nivell de seguretat que volem instaurar.
+			insecure: per a permetre els ports per sobre el 1024. (requeriment per macos)
+
+			Un cop preparat el fitxer exports, anem al client a fer el muntatge del sistema de fitxers:
+			#mount -t nfs 10.0.0.5:/(arrel del nfs) /nfs(carpeta en la màquina client)
+
+			I ja podem accedir al contingut del servidor via nfs.
+
+			Per a no haver de muntar cada vegada el servei, podem incloure al fitxer fstab perquè s'automonti afegint:
+
+			10.0.0.5:/		/nfs		nfs4		rw,auto		0		0
+
+Captura de xarxa:
+
+		En aquesta captura de xarxa podem apreciar que els paquets entren pel port 2049	i si mirem l'últim enllaç d'interès, tenim una llista on cada port té el servei que s'utilitza i podem comprovar que nfs va pel port 2049 la qual cosa és una bona senyal.
+
+		Una característica interessant de nfs és que com que no hem afegit kerberos, la comunicació no va xifrada i per tant és totalment interpretable a nivell de paquet. Per exemple si anem al paquet 88 podem veure que és una consulta ls contra el servidor i podem veure el contingut del directori en aquell moment perquè s'ha interceptat i dexifrat el paquet. Per tant la comunicació no va xifrada amb la qual cosa no és una bona praxis en un servidor obert però és una eina util per a xarxes locals.
+
+3- Configurar samba
+
+			Volem instal·lar un servei samba.
+
+			Accions a realitzar al servidor:
+
+			Instal·lem el paquet samba al servidor:
+				#apt-get install samba
+			creem la carpeta per al servei:
+				#mkdir /services/samba
+			Creem una carpeta pública a mode de repositori:
+				#mkdir /services/samba/repositori
+			I una per un usuari concret:
+				#mkdir /services/samba/entel
+
+			Configurem el fitxer smb.conf per tal que podem accedir com desitgem.
+				#nano /etc/samba/smb.conf
+
+			Aquí podem configurar el servei de manera que tinguem una carpeta compartida públicament i una per a un usuari concret com podria ser entel.
+
+			[repositori]
+			comment = Repositori de dades				-> informació sobre el directori
+			path = /services/samba/repositori		-> path al directori
+			guest ok = yes											-> tipus d'accés com a convidat/públic
+			read only = yes											-> permís de només lectura
+
+			[entel]
+			path = /services/samba/entel
+			valid users = entel									-> llista d'usuaris admesos
+			read only = no											-> permís de lectura i escriptura
+
+			Un cop hem editat i guardat el fitxer cal afegir l'usuari entel a samba:
+					#smbpassword -a entel
+
+			Reiniciem el servei:
+					#service smbd restart
+
+			Comprovem que hàgim editat bé el fitxer:
+					#testparm
+
+			Accions a fer al client:
+			Instal·lar el paquet del client:
+					#apt-get install smbclient
+			connectar-nos al servei:
+					#smbclient //10.0.0.5/entel -U entel
+			Realitzem múltiples proves per veure que realment és el què voliem aconseguir.
+			Exemples:
+						- Provem amb un altre usuari que no te accés a samba.
+						- Provem amb un usuari que sí te accés a samba contra la carpeta entel.
+						- Provem els permisos de lectura i escriptura donats a les carpetes.
+						- Provem de pujar i descarregar arxius.
+						- Mirem la concordança dels arxius en les carpetes del servidor i el que veu el client
+						- ...
+			Per a muntar el servei, creem la carpeta /mnt/samba:
+				#mkdir -p /mnt/samba
+			Podem muntar el servei samba amb la en una carpeta amb la comanda:
+				#mount -t smbfs -o username=entel,password=letne //10.0.0.5/entel /mnt/samba
+			També podem fer que es munti sol al arrancar amb el fitxer fstab:
+				#nano /etc/fstab
+			Afegim la següent línia pel nostre cas:
+			
+				//10.0.0.5/entel /mnt/samba smbfs username=entel,password=letne 0 0
+		
+			
+Captura de xarxa:
+
+		Passa quasi el mateix que amb nfs, com que no hi ha seguretat, podem veure la interacció que ha mantingut el client i el servidor de tal manera que es poden interpretar dades, directoris i tot tipus de fitxers que s'involucrin.
+
+		El port, torna a correspondre amb el del protocol SMB la qual cosa significa	que les 3 captures de xarxa corresponen als serveis que s'han implementat respectivament.
+
+Llocs d'interès:
+https://www.debian.org/doc/manuals/debian-handbook/index.es.html
+https://debian-handbook.info/browse/es-ES/stable/sect.nfs-file-server.html
+https://coderwall.com/p/slfhzg/creating-a-jailed-sftp-users-on-debian
+http://wiki.linux-nfs.org/wiki/index.php/Nfsv4_configuration
+https://linux.die.net/man/5/exports
+http://persoal.citius.usc.es/tf.pena/ASR/Tema_4html/node7.html
+https://help.ubuntu.com/community/NFSv4Howto
+https://wiki.debian.org/SambaServerSimple
+https://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers
+https://www.cyberciti.biz/faq/access-windows-shares-from-linux/
+https://www.digitalocean.com/community/tutorials/how-to-use-sshfs-to-mount-remote-file-systems-over-ssh

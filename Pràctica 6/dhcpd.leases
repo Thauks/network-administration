@@ -1,0 +1,719 @@
+# The format of this file is documented in the dhcpd.leases(5) manual page.
+# This lease file was written by isc-dhcp-4.3.1
+
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:03:27;
+  ends 6 2017/05/06 00:05:27;
+  cltt 6 2017/05/06 00:03:27;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 0 2017/04/30 04:29:39;
+  ends 0 2017/04/30 04:39:39;
+  tstp 0 2017/04/30 04:39:39;
+  cltt 0 2017/04/30 04:29:39;
+  binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+}
+lease 10.0.1.10 {
+  starts 0 2017/04/30 03:53:32;
+  ends 0 2017/04/30 15:53:32;
+  tstp 0 2017/04/30 15:53:32;
+  cltt 0 2017/04/30 03:53:32;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:01;
+  client-hostname "seax";
+}
+lease 10.0.1.11 {
+  starts 0 2017/04/30 03:54:21;
+  ends 0 2017/04/30 15:54:21;
+  tstp 0 2017/04/30 15:54:21;
+  cltt 0 2017/04/30 03:54:21;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:02;
+  client-hostname "seax";
+}
+lease 10.0.1.10 {
+  starts 0 2017/04/30 03:53:32;
+  ends 0 2017/04/30 15:53:32;
+  tstp 0 2017/04/30 15:53:32;
+  cltt 0 2017/04/30 03:53:32;
+  binding state free;
+  hardware ethernet 08:00:21:00:00:01;
+}
+lease 10.0.1.11 {
+  starts 0 2017/04/30 03:54:21;
+  ends 0 2017/04/30 15:54:21;
+  tstp 0 2017/04/30 15:54:21;
+  cltt 0 2017/04/30 03:54:21;
+  binding state free;
+  hardware ethernet 08:00:21:00:00:02;
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:04:13;
+  ends 6 2017/05/06 00:14:13;
+  cltt 6 2017/05/06 00:04:13;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:04:24;
+  ends 6 2017/05/06 00:14:24;
+  cltt 6 2017/05/06 00:04:24;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:08:26;
+  ends 6 2017/05/06 00:18:26;
+  cltt 6 2017/05/06 00:08:26;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:08:28;
+  ends 6 2017/05/06 00:18:28;
+  cltt 6 2017/05/06 00:08:28;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:12:45;
+  ends 6 2017/05/06 00:22:45;
+  cltt 6 2017/05/06 00:12:45;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:12:51;
+  ends 6 2017/05/06 00:22:51;
+  cltt 6 2017/05/06 00:12:51;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:16:53;
+  ends 6 2017/05/06 00:26:53;
+  cltt 6 2017/05/06 00:16:53;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:17:31;
+  ends 6 2017/05/06 00:27:31;
+  cltt 6 2017/05/06 00:17:31;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:20:40;
+  ends 6 2017/05/06 00:30:40;
+  cltt 6 2017/05/06 00:20:40;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:21:27;
+  ends 6 2017/05/06 00:31:27;
+  cltt 6 2017/05/06 00:21:27;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.1.10 {
+  starts 6 2017/05/06 00:21:47;
+  ends 6 2017/05/06 00:21:47;
+  cltt 6 2017/05/06 00:21:47;
+  binding state abandoned;
+  next binding state free;
+  rewind binding state free;
+  client-hostname "seax";
+}
+lease 10.0.1.12 {
+  starts 6 2017/05/06 00:21:51;
+  ends 6 2017/05/06 12:21:51;
+  cltt 6 2017/05/06 00:21:51;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:01;
+  client-hostname "seax";
+}
+lease 10.0.1.10 {
+  starts 6 2017/05/06 00:21:47;
+  ends 6 2017/05/06 00:21:47;
+  cltt 6 2017/05/06 00:21:47;
+  binding state free;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:24:51;
+  ends 6 2017/05/06 00:34:51;
+  cltt 6 2017/05/06 00:24:51;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.1.11 {
+  starts 6 2017/05/06 00:25:01;
+  ends 6 2017/05/06 00:25:01;
+  cltt 6 2017/05/06 00:25:01;
+  binding state abandoned;
+  next binding state free;
+  rewind binding state free;
+  client-hostname "seax";
+}
+lease 10.0.1.13 {
+  starts 6 2017/05/06 00:25:08;
+  ends 6 2017/05/06 12:25:08;
+  cltt 6 2017/05/06 00:25:08;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:02;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:26:26;
+  ends 6 2017/05/06 00:36:26;
+  cltt 6 2017/05/06 00:26:26;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.1.11 {
+  starts 6 2017/05/06 00:25:01;
+  ends 6 2017/05/06 00:25:01;
+  cltt 6 2017/05/06 00:25:01;
+  binding state free;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:29:45;
+  ends 6 2017/05/06 00:39:45;
+  cltt 6 2017/05/06 00:29:45;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:30:24;
+  ends 6 2017/05/06 00:40:24;
+  cltt 6 2017/05/06 00:30:24;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:33:11;
+  ends 6 2017/05/06 00:33:11;
+  tstp 6 2017/05/06 00:33:11;
+  cltt 6 2017/05/06 00:33:11;
+  binding state abandoned;
+  next binding state free;
+  rewind binding state free;
+}
+lease 10.0.2.12 {
+  starts 6 2017/05/06 00:33:18;
+  ends 6 2017/05/06 00:43:18;
+  cltt 6 2017/05/06 00:33:18;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:33:46;
+  ends 6 2017/05/06 00:33:46;
+  tstp 6 2017/05/06 00:33:46;
+  cltt 6 2017/05/06 00:33:46;
+  binding state abandoned;
+  next binding state free;
+  rewind binding state free;
+}
+lease 10.0.2.5 {
+  starts 6 2017/05/06 00:33:54;
+  ends 6 2017/05/06 00:43:54;
+  cltt 6 2017/05/06 00:33:54;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:33:11;
+  ends 6 2017/05/06 00:33:11;
+  tstp 6 2017/05/06 00:33:11;
+  cltt 6 2017/05/06 00:33:11;
+  binding state free;
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:35:18;
+  ends 6 2017/05/06 00:45:18;
+  cltt 6 2017/05/06 00:35:18;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:33:46;
+  ends 6 2017/05/06 00:33:46;
+  tstp 6 2017/05/06 00:33:46;
+  cltt 6 2017/05/06 00:33:46;
+  binding state free;
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:35:54;
+  ends 6 2017/05/06 00:45:54;
+  cltt 6 2017/05/06 00:35:54;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:35:54;
+  ends 6 2017/05/06 00:36:24;
+  tstp 6 2017/05/06 00:36:24;
+  cltt 6 2017/05/06 00:35:54;
+  binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:36:52;
+  ends 6 2017/05/06 00:46:52;
+  cltt 6 2017/05/06 00:36:52;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.12 {
+  starts 6 2017/05/06 00:38:11;
+  ends 6 2017/05/06 00:48:11;
+  cltt 6 2017/05/06 00:38:11;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.5 {
+  starts 6 2017/05/06 00:38:29;
+  ends 6 2017/05/06 00:48:29;
+  cltt 6 2017/05/06 00:38:29;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.1.12 {
+  starts 6 2017/05/06 00:21:51;
+  ends 6 2017/05/06 00:38:43;
+  tstp 6 2017/05/06 00:38:43;
+  cltt 6 2017/05/06 00:30:40;
+  binding state free;
+  hardware ethernet 08:00:21:00:00:01;
+}
+lease 10.0.1.12 {
+  starts 6 2017/05/06 00:38:49;
+  ends 6 2017/05/06 12:38:49;
+  cltt 6 2017/05/06 00:38:49;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:01;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:40:17;
+  ends 6 2017/05/06 00:50:17;
+  cltt 6 2017/05/06 00:40:17;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.1.13 {
+  starts 6 2017/05/06 00:25:08;
+  ends 6 2017/05/06 00:40:26;
+  tstp 6 2017/05/06 00:40:26;
+  cltt 6 2017/05/06 00:25:35;
+  binding state free;
+  hardware ethernet 08:00:21:00:00:02;
+}
+lease 10.0.1.13 {
+  starts 6 2017/05/06 00:40:32;
+  ends 6 2017/05/06 12:40:32;
+  cltt 6 2017/05/06 00:40:32;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:02;
+  client-hostname "seax";
+}
+lease 10.0.2.5 {
+  starts 6 2017/05/06 00:41:14;
+  ends 6 2017/05/06 00:51:14;
+  cltt 6 2017/05/06 00:41:14;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:41:49;
+  ends 6 2017/05/06 00:51:49;
+  cltt 6 2017/05/06 00:41:49;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.1.13 {
+  starts 6 2017/05/06 00:40:32;
+  ends 6 2017/05/06 00:41:52;
+  tstp 6 2017/05/06 00:41:52;
+  cltt 6 2017/05/06 00:40:32;
+  binding state free;
+  hardware ethernet 08:00:21:00:00:02;
+}
+lease 10.0.1.13 {
+  starts 6 2017/05/06 00:42:03;
+  ends 6 2017/05/06 12:42:03;
+  cltt 6 2017/05/06 00:42:03;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:02;
+  client-hostname "seax";
+}
+lease 10.0.2.12 {
+  starts 6 2017/05/06 00:42:21;
+  ends 6 2017/05/06 00:52:21;
+  cltt 6 2017/05/06 00:42:21;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.5 {
+  starts 6 2017/05/06 00:43:45;
+  ends 6 2017/05/06 00:53:45;
+  cltt 6 2017/05/06 00:43:45;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:44:49;
+  ends 6 2017/05/06 00:54:49;
+  cltt 6 2017/05/06 00:44:49;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:45:58;
+  ends 6 2017/05/06 00:55:58;
+  cltt 6 2017/05/06 00:45:58;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.12 {
+  starts 6 2017/05/06 00:46:28;
+  ends 6 2017/05/06 00:56:28;
+  cltt 6 2017/05/06 00:46:28;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.5 {
+  starts 6 2017/05/06 00:47:59;
+  ends 6 2017/05/06 00:57:59;
+  cltt 6 2017/05/06 00:47:59;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.1.13 {
+  starts 6 2017/05/06 00:42:03;
+  ends 6 2017/05/06 00:48:45;
+  tstp 6 2017/05/06 00:48:45;
+  cltt 6 2017/05/06 00:42:03;
+  binding state free;
+  hardware ethernet 08:00:21:00:00:02;
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:49:39;
+  ends 6 2017/05/06 00:59:39;
+  cltt 6 2017/05/06 00:49:39;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.1.13 {
+  starts 6 2017/05/06 00:50:06;
+  ends 6 2017/05/06 12:50:06;
+  cltt 6 2017/05/06 00:50:06;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:02;
+  client-hostname "seax";
+}
+lease 10.0.1.13 {
+  starts 6 2017/05/06 00:50:06;
+  ends 6 2017/05/06 00:50:15;
+  tstp 6 2017/05/06 00:50:15;
+  cltt 6 2017/05/06 00:50:06;
+  binding state free;
+  hardware ethernet 08:00:21:00:00:02;
+}
+lease 10.0.1.13 {
+  starts 6 2017/05/06 00:50:28;
+  ends 6 2017/05/06 12:50:28;
+  cltt 6 2017/05/06 00:50:28;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:02;
+  client-hostname "seax";
+}
+lease 10.0.2.12 {
+  starts 6 2017/05/06 00:50:29;
+  ends 6 2017/05/06 01:00:29;
+  cltt 6 2017/05/06 00:50:29;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:50:32;
+  ends 6 2017/05/06 01:00:32;
+  cltt 6 2017/05/06 00:50:32;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.5 {
+  starts 6 2017/05/06 00:51:47;
+  ends 6 2017/05/06 01:01:47;
+  cltt 6 2017/05/06 00:51:47;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:53:08;
+  ends 6 2017/05/06 01:03:08;
+  cltt 6 2017/05/06 00:53:08;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:54:18;
+  ends 6 2017/05/06 01:04:18;
+  cltt 6 2017/05/06 00:54:18;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.12 {
+  starts 6 2017/05/06 00:54:58;
+  ends 6 2017/05/06 01:04:58;
+  cltt 6 2017/05/06 00:54:58;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.5 {
+  starts 6 2017/05/06 00:55:46;
+  ends 6 2017/05/06 01:05:46;
+  cltt 6 2017/05/06 00:55:46;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 00:55:50;
+  ends 6 2017/05/06 01:05:50;
+  cltt 6 2017/05/06 00:55:50;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.1.13 {
+  starts 6 2017/05/06 00:50:28;
+  ends 6 2017/05/06 00:57:45;
+  tstp 6 2017/05/06 00:57:45;
+  cltt 6 2017/05/06 00:50:28;
+  binding state free;
+  hardware ethernet 08:00:21:00:00:02;
+}
+lease 10.0.1.13 {
+  starts 6 2017/05/06 00:57:53;
+  ends 6 2017/05/06 12:57:53;
+  cltt 6 2017/05/06 00:57:53;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:02;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 00:58:34;
+  ends 6 2017/05/06 01:08:34;
+  cltt 6 2017/05/06 00:58:34;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.12 {
+  starts 6 2017/05/06 00:59:19;
+  ends 6 2017/05/06 01:09:19;
+  cltt 6 2017/05/06 00:59:19;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.5 {
+  starts 6 2017/05/06 00:59:47;
+  ends 6 2017/05/06 01:09:47;
+  cltt 6 2017/05/06 00:59:47;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.4 {
+  starts 6 2017/05/06 01:00:30;
+  ends 6 2017/05/06 01:10:30;
+  cltt 6 2017/05/06 01:00:30;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.5 {
+  starts 6 2017/05/06 01:02:24;
+  ends 6 2017/05/06 01:12:24;
+  cltt 6 2017/05/06 01:02:24;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:03;
+  client-hostname "seax";
+}
+lease 10.0.2.11 {
+  starts 6 2017/05/06 01:02:50;
+  ends 6 2017/05/06 01:12:50;
+  cltt 6 2017/05/06 01:02:50;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
+lease 10.0.2.12 {
+  starts 6 2017/05/06 01:03:21;
+  ends 6 2017/05/06 01:13:21;
+  cltt 6 2017/05/06 01:03:21;
+  binding state active;
+  next binding state free;
+  rewind binding state free;
+  hardware ethernet 08:00:21:00:00:04;
+  client-hostname "seax";
+}
